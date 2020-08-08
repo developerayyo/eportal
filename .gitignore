@@ -8,3 +8,6 @@ db.sqlite3
 env/
 celerybeat-schedule
 /fixtures
+__pycache__/
+portal/__pycache__/
+eportal/__pycache__/

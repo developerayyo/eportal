@@ -1,9 +1,7 @@
 from .base import *
 
 DEBUG = False
-ADMINS = [(
-    ('Peter B', 'babalolapeter@icloud.com'),
-)]
+ADMINS = [('Peter B', 'babalolapeter@icloud.com'),]
 
 ALLOWED_HOSTS = ['*']
 

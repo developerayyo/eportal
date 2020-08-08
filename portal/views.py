@@ -25,6 +25,7 @@ from .models import (
     TakenCourse, Result, Semester, CourseAllocation, Session
 )
 
+
 @login_required
 def home(request):
     """
@@ -154,6 +155,7 @@ def change_password(request):
     return render(request, 'account/change_password.html', {
         'form': form,
     })
+
 
 def get_chart(request, *args, **kwargs):
     all_query_score = ()
@@ -410,6 +412,7 @@ def semester_delete_view(request, pk):
         messages.success(request, "Semester successfully deleted")
     return redirect('manage_semester')
 
+
 @login_required
 @admin_required
 def StaffAddView(request):
@@ -447,9 +450,8 @@ def StaffAddView(request):
             is_student="0",
             is_lecturer="1",
             phone=column[2],
-            address=column[3],
             picture=None,
-            email=column[4])
+            email=column[3])
         default_password_staff.delay(usernames, raw_password)
     context = {}
     return render(request, template, context)
@@ -513,27 +515,26 @@ def StudentAddView(request):
                 date_joined="2020-08-03 09:46:42",
                 is_student="1",
                 is_lecturer="0",
-                phone=column[2],
-                address=column[3],
-                picture=None,
-                email=column[4])
+                phone=column[6],
+                email=column[7])
             _, student_profile = Student.objects.update_or_create(
                 user=User.objects.get(username=usernames),
-                id_number=column[5],
-                level=column[6],
-                department=column[7],
-                faculty=column[8])
+                id_number=column[2],
+                level=column[3],
+                department=column[4],
+                faculty=column[5])
             # lauch celery task
-            default_password.delay(column[5 ], raw_password)
+            default_password.delay(column[2], raw_password)
             # response = HttpResponse(csv_file_w, content_type='text/csv')
             # response['Content-Disposition'] = 'attachment; filename="student_details.csv"'
             # writer = csv.writer(response)
-            # writer.writerow([column[0], raw_password])           
+            # writer.writerow([column[0], raw_password])
     except IndexError:
         """Other Possible Exceptions: IndexError, Integrity Error"""
         messages.error(request, "Index Error:  Your CSV files is incomplete")
     context = {}
     return render(request, template, context)
+
 
 @login_required
 @lecturer_required
@@ -587,7 +588,7 @@ def CourseAddView(request):
     except:
         messages.error(request, "Integrity Error:  course already exists")
     context = {}
-    return render(request, template, context)
+    return redirect('course_list')
 
 
 @login_required
@@ -662,7 +663,7 @@ def course_allocation_upload(request):
         allocations.courses.add(Course.objects.get(courseCode=column[1]))
         allocations.save()
     context = {}
-    return render(request, template, context)
+    return redirect('course_allocation_view')
 
 
 @login_required
@@ -734,6 +735,7 @@ def first_class_list(request):
     return render(request, 'students/first_class_students.html',
                   {"students": students})
 
+
 @login_required
 @student_required
 def course_registration(request):
@@ -748,8 +750,19 @@ def course_registration(request):
             course = Course.objects.get(pk=ids[s])
             obj = TakenCourse.objects.create(student=student, course=course)
             obj.save()
+            # total_courses = 0
+            # for i in obj:
+            #     total_courses += int(i.course.courseUnit)
+            # if total_courses < 16:
+            #     obj.delete()
+            #     messages.error(request, 'You need minimum of 16 units of course \
+            #         load to continue!!')
+            # elif total_courses > 24:
+            #     obj.delete()
+            #     messages.error(request, 'The maximum course load is 24units!! of \
+            #         please try again!!')
             messages.success(request, 'Courses Registered Successfully!')
-        return redirect('course_registration')
+        return redirect('registered_courses')
     else:
         current_semester = Semester.objects.get(is_current_semester=True)
         student = Student.objects.get(user__pk=request.user.id)
@@ -758,14 +771,17 @@ def course_registration(request):
         t = ()
         for i in taken_courses:
             t += (i.course.pk, )
-        courses = Course.objects.filter(level=student.level, semester=current_semester).exclude(id__in=t)
-        all_courses = Course.objects.filter(level=student.level, semester=current_semester)
+        courses = Course.objects.filter(
+            level=student.level, semester=current_semester).exclude(id__in=t)
+        all_courses = Course.objects.filter(
+            level=student.level, semester=current_semester)
 
         no_course_is_registered = False  # Check if no course is registered
         all_courses_are_registered = False
 
         registered_courses = Course.objects.filter(level=student.level, semester=current_semester).filter(
             id__in=t)
+
         if registered_courses.count(
         ) == 0:  # Check if number of registered courses is 0
             no_course_is_registered = True
@@ -799,12 +815,13 @@ def course_registration(request):
 def registered_courses(request):
     level = Student.objects.get(user__pk=request.user.id)
     courses = TakenCourse.objects.filter(student__user__id=request.user.id,
-                                             course__level=level.level)
+                                         course__level=level.level)
     context = {
         'courses': courses,
         'level': level,
-        }
+    }
     return render(request, 'course/registered_courses.html', context)
+
 
 @login_required
 @student_required
@@ -892,6 +909,7 @@ def course_registration_pdf(request):
         stylesheets=[weasyprint.CSS(settings.STATIC_ROOT + '/css/pdf.css')])
     return response
 
+
 @login_required
 @student_required
 def result_pdf(request):
@@ -902,8 +920,9 @@ def result_pdf(request):
     courses = TakenCourse.objects.filter(student__user__pk=request.user.id,
                                          course__level=student.level,
                                          course__semester=current_semester
-                                       )
-    result = Result.objects.filter(student__user__pk=request.user.id, semester=current_semester)
+                                         )
+    result = Result.objects.filter(
+        student__user__pk=request.user.id, semester=current_semester)
     current_CGPA = 0
     try:
         a = Result.objects.get(student__user__pk=request.user.id,
@@ -944,6 +963,7 @@ def result_pdf(request):
         response,
         stylesheets=[weasyprint.CSS(settings.STATIC_ROOT + '/css/resultpdf.css')])
     return response
+
 
 @login_required
 @lecturer_required
