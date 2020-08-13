@@ -754,13 +754,13 @@ def course_registration(request):
             # for i in obj:
             #     total_courses += int(i.course.courseUnit)
             # if total_courses < 16:
-            #     obj.delete()
             #     messages.error(request, 'You need minimum of 16 units of course \
             #         load to continue!!')
+            #     return redirect('course_registration')
             # elif total_courses > 24:
-            #     obj.delete()
-            #     messages.error(request, 'The maximum course load is 24units!! of \
+            #     messages.error(request, 'The maximum course load is 24 units!! \
             #         please try again!!')
+            #     return redirect('course_registration')
             messages.success(request, 'Courses Registered Successfully!')
         return redirect('registered_courses')
     else:

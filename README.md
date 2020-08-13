@@ -1,4 +1,4 @@
-# University Course and Result Management System
+# Django Powered University Course and Result Management System
 
 ## Installation
 
@@ -37,3 +37,7 @@ on linux run: `python manage.py createsuperuser` on windows run: `py manage.py c
 1. push the commits to your branch `git push origin <your-name>`
 
 1. Nice work. so wait for some time while the admin reviews and merge your pull request.
+
+## Documentation
+
+Click [here](https://eportalproject.readthedocs.io/en/latest/?) dive in to project documentation.
