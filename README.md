@@ -40,4 +40,4 @@ on linux run: `python manage.py createsuperuser` on windows run: `py manage.py c
 
 ## Documentation
 
-Click [here](https://eportalproject.readthedocs.io/en/latest/?) dive in to project documentation.
+Click [here](https://eportalproject.readthedocs.io/en/latest/index.html) dive in to project documentation.
