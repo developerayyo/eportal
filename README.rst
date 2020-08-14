@@ -22,8 +22,7 @@ Installation
 Staying up-to date with this repo
 =================================
 
-1. kindly *watch* this repo by clicking the watch button above so as to get
- notified whenever commits are made or when new issues are raised and so on.
+1. kindly *watch* this repo by clicking the watch button above so as to get notified whenever commits are made or when new issues are raised and so on.
 
 2. on your local machine, run ``git remote add upstream git@github.com/developerayyo/eportal.git``
 
