@@ -5,7 +5,7 @@ Django Powered University Course and Result Management System
 Installation
 ============
 
-1. fork this repo to your account
+1. fork this `Repo <https://github.com/developerayyo/eportal/>`_  to your github account
 
 2. Clone the forked version on your system  by running the following command from the command line ``git clone https://github.com/your-username/eportal``
 
