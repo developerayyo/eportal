@@ -37,7 +37,7 @@ Want to Contribute
 
 3. push the commits to your branch ``git push origin <your-branch-name>``
 
-4. Nice work. so wait for some time while the admin reviews and merge your pull request.
+4. Nice work. so go to your github page and make pull request, wait for some time while the admin reviews and merge your pull request.
 
 Documentation
 =============
