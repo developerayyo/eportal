@@ -11,3 +11,6 @@ celerybeat-schedule
 __pycache__/
 portal/__pycache__/
 eportal/__pycache__/
+docs/_build/
+docs/_static/
+docs/_templates/

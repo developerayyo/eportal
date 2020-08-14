@@ -1,16 +1,15 @@
 Simple Documentation for Eportal Project
 ========================================
 
-Guide
-^^^^^
-   
+Table of Contents
+^^^^^^^^^^^^^^^^^
+
 
 .. toctree::
    :maxdepth: 3
    
-   installation
-   license
-   help
+   getting started
+   abstract
 
 
 Indices and tables
