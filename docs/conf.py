@@ -17,7 +17,7 @@
 
 # -- Project information -----------------------------------------------------
 
-project = 'eportal'
+project = 'acrrps'
 copyright = '2020, Peter Babalola'
 author = 'Peter Babalola'
 
