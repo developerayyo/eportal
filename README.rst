@@ -2,7 +2,7 @@
 Automated Course Registratiion and Result Processing System (ACRRPS)
 ====================================================================
 
-|build-status| |docs| |coverage|
+|repo-size|
 
 **ACRRPS** is a Project I developed *(with Python and Django Web Framework)* in partial fulfilment of the requirements for the award of Bachelor's degree in Computer Science of **Adeleke University Ede, Nigeria**.
 
@@ -51,3 +51,6 @@ Want to Contribute
 3. push the commits to your branch ``git push origin <your-branch-name>``
 
 4. Nice work. so go to your github page and make pull request, wait for some time while the admin reviews and merge your pull request.
+
+.. |repo-size| image:: https://img.shields.io/github/repo-size/developerayyo/eportal?style=flat
+    :alt: repo size
