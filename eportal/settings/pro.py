@@ -3,7 +3,7 @@ from .base import *
 DEBUG = False
 ADMINS = [('Peter B', 'babalolapeter@icloud.com'),]
 
-ALLOWED_HOSTS = ['*']
+ALLOWED_HOSTS = ['eportalproject.ml', 'www.eportalproject.ml']
 
 # DATABASES = {
 #     'default': {
