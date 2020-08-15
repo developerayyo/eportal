@@ -57,9 +57,12 @@ Want to Contribute
     
 .. |licence| image:: https://img.shields.io/github/license/developerayyo/eportal?style=flat
     :alt: licence
+    :target: https://eportalproject.readthedocs.io/en/latest/getting%20started.html#licences
 
 .. |website| image:: https://img.shields.io/website?up_message=eportalproject.ml&url=https%3A%2F%2Feportalproject.ml
     :alt: Website
+    :target: https://eportalproject.ml
 
 .. |docs| image:: https://img.shields.io/readthedocs/eportalproject
     :alt: Read the Docs
+    :target: https://eportalproject.readthedocs.io/en/latest/index.html
