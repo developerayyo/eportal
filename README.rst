@@ -1,6 +1,17 @@
-=============================================================
-Django Powered University Course and Result Management System
-=============================================================
+====================================================================
+Automated Course Registratiion and Result Processing System (ACRRPS)
+====================================================================
+
+ACRRPS is a Project I developeved (with Python and Django Web Framework) in partial fulfilment of the requirements for the award of Bachelor's degree in Computer Science of Adeleke University Ede, Nigeria.
+
+Although ACRRPS is still much more in development, it has been deployed with AWS ec2 Instance, Nginx Web Server, UWSGI and  you can access it `here <https://eportalproject.ml>`_
+
+
+Documentation
+=============
+
+I make use of Readthedocs.io to manage the documentation and you can click `here <https://eportalproject.readthedocs.io/en/latest/index.html>`_ to dive into the project documentation.
+
 
 Installation
 ============
@@ -38,8 +49,3 @@ Want to Contribute
 3. push the commits to your branch ``git push origin <your-branch-name>``
 
 4. Nice work. so go to your github page and make pull request, wait for some time while the admin reviews and merge your pull request.
-
-Documentation
-=============
-
-Click `here <https://eportalproject.readthedocs.io/en/latest/index.html>`_ to dive into project documentation.
