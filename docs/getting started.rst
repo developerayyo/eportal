@@ -15,9 +15,11 @@ Installation
 
 5. while in the project directory, Install the requirements with the following command: ``pip3 install -r requirements.txt``
 
-6. Then create a superuser for django: on linux run: ``python manage.py createsuperuser``. On windows ? run: ``py manage.py createsuperuser`` then follow the on-screen prompts.
+6. rename ``.env_example`` file in the project root directory to ``.env`` and insert correct values for SECRET_KEY and EMAIL Credentials in the ``.env`` file.
 
-7. Finally run: on linux: ``python manage.py runserver``. On windows: ``py manage.py runserver`` boom! you have the project up and running.
+7. Then create a superuser for django: on linux run: ``python manage.py createsuperuser``. On windows ? run: ``py manage.py createsuperuser`` then follow the on-screen prompts.
+
+8. Finally run: on linux: ``python manage.py runserver``. On windows: ``py manage.py runserver`` boom! you have the project up and running.
 
 Licences
 ========
