@@ -67,4 +67,4 @@ Want to Contribute
 
 .. |docs| image:: https://img.shields.io/readthedocs/eportalproject
     :alt: Read the Docs
-    :target: https://eportalproject.readthedocs.io/en/latest/index.html
+    :target: https://docs.eportalproject.ml 
