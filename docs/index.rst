@@ -13,9 +13,9 @@ Table of Contents
 
    .. toctree::
       :maxdepth: 2
-   
-      getting started
-      overview
+      :glob:
+
+      *
 
 Indices and tables
 ==================
