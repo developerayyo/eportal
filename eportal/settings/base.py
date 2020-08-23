@@ -122,9 +122,6 @@ TEMPLATES[0]['OPTIONS']['context_processors'].append(
 TEMPLATES[0]['OPTIONS']['context_processors'].append(
     "portal.context_processors.session_processor")
 
-FIXTURE_DIRS = (
-    os.path.join(BASE_DIR, 'portal/fixtures'),
-)
 
 EMAIL_USE_TLS = True
 EMAIL_HOST = os.environ['EMAIL_HOST']
