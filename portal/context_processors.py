@@ -1,5 +1,3 @@
-"""
-    """
 import datetime
 
 from .models import Session, Semester, FIRST

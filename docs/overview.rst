@@ -92,8 +92,7 @@ Administrator
 
 Proposed Enhancements
 =====================
-    I learnt recently, that the DEAN of Faculties, Head Of Departments, And The Exams & Records also has
-        an important role to play on ACRRPS. I planned to learn and research more on ACRRPS for better Understanding and Implementation of this Project.
+    I learnt recently, that the DEAN of Faculties, Head Of Departments, And The Exams & Records also has an important role to play on ACRRPS. I planned to learn and research more on ACRRPS for better Understanding and Implementation of this Project.
 
 Contribution
 ============

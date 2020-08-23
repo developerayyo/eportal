@@ -1,6 +1,6 @@
 {% extends 'base.html' %}
 
-{% block title %} Student lists | Eportal {% endblock title %}
+{% block title %}ACRRPS | Student lists{% endblock title %}
 
 {% block side_bar %}
     {% include 'partial_active_element.html' with active='Dashboard' %}
@@ -16,20 +16,6 @@ overflow-y: auto;
 </style>
 	<div class="container-fluid mt-5">
 
-            <!-- Heading -->
-            <div class="card mb-4 wow fadeIn">
-
-                <!--Card content-->
-                <div class="card-body d-sm-flex justify-content-between">
-
-                    <h6 class="mb-2 mb-sm-0 pt-1">
-                        <a href="/">Home Page</a>
-                        <span>/</span>
-                        <span>Repeaters</span>
-                    </h6>
-                </div>
-
-            </div>
             {% if request.user.is_superuser %}
             <!-- Heading -->
             <h6 class="mb-2 mb-sm-0 pt-1">

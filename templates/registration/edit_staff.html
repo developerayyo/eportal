@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 
 {% load crispy_forms_tags %}
-{% block title %} Edit Lecturer | Eportal {% endblock title %}
+{% block title %}ACRRPS | Edit Lecturer{% endblock title %}
 
 {% block side_bar %}
     {% include 'partial_active_element.html' with active='staff' %}
@@ -17,15 +17,6 @@
           </div>
         {% endfor %}
       {% endif %}
-  <div class="card mb-4 wow fadeIn">
-    <div class="card-body d-sm-flex justify-content-between">
-      <h6 class="mb-2 mb-sm-0 pt-1">
-        <a href="/">Home Page</a>
-         <span>/</span>
-         <span>Edit Staff</span>
-        </h6>
-    </div>
-  </div>
 <!-- Extended material form grid -->
 <form method="post">{% csrf_token %}
   <!-- Grid row -->

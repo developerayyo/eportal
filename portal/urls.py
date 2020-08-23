@@ -75,5 +75,5 @@ urlpatterns = [
           name='result_pdf'),
     path('score/', views.add_score, name='add_score'),
     path('score/<int:id>/', views.add_score_for, name='add_score_for'),
-    path('scoresheet/download/', views.scoresheet_download, name='scoresheet_download'),
+    path('scoresheet/download/<int:id>/', views.scoresheet_download, name='scoresheet_download'),
 ]

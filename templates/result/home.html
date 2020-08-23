@@ -1,6 +1,6 @@
  {% extends 'base.html' %}
  {% load humanize %}
-{% block title %} Dashboard | Eportal {% endblock title %}
+{% block title %} ACRRPS | Dashboard {% endblock title %}
 
 {% block js %}
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.3/Chart.min.js" integrity="sha256-oSgtFCCmHWRPQ/JmR4OoZ3Xke1Pw4v50uh6pLcu+fIc=" crossorigin="anonymous"></script>
@@ -103,22 +103,6 @@
 {% endblock js %}
 {% block content %}
  <div class="container-fluid mt-5">
-
-            <!-- Heading -->
-            <div class="card mb-4 wow fadeIn">
-
-                <!--Card content-->
-                <div class="card-body d-sm-flex justify-content-between">
-
-                    <h6 class="mb-2 mb-sm-0 pt-1">
-                        <a href="/">Home Page</a>
-                    </h6>
-                </div>
-
-            </div>
-            <!-- Heading -->
-
-
             {% if request.user.is_superuser %}
             <!--Grid row-->
             <div class="row wow fadeIn">

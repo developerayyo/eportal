@@ -36,6 +36,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'django.contrib.humanize',
     'crispy_forms',
+    'import_export',
 ]
 
 MIDDLEWARE = [
@@ -122,7 +123,7 @@ TEMPLATES[0]['OPTIONS']['context_processors'].append(
     "portal.context_processors.session_processor")
 
 FIXTURE_DIRS = (
-    os.path.join(BASE_DIR, 'fixtures'),
+    os.path.join(BASE_DIR, 'portal/fixtures'),
 )
 
 EMAIL_USE_TLS = True

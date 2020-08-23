@@ -1,4 +1,5 @@
 from django.contrib import admin
+# from import_export.admin import ImportExportModelAdmin
 
 
 from .models import (
@@ -29,6 +30,10 @@ class ScoreAdmin(admin.ModelAdmin):
 class ResultAdmin(admin.ModelAdmin):
     list_display = ['student', 'gpa', 'semester', 'level', 'cgpa']
 
+# class ResultResource(ImportExportModelAdmin):
+#     resource_class = Result
+
 
 admin.site.register(TakenCourse, ScoreAdmin)
 admin.site.register(Result, ResultAdmin)
+# admin.site.register(Result, ResultResource)

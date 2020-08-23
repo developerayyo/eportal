@@ -745,24 +745,37 @@ def course_registration(request):
         data.pop('csrfmiddlewaretoken', None)  # remove csrf_token
         for key in data.keys():
             ids = ids + (str(key), )
+        obj = None
         for s in range(0, len(ids)):
             student = Student.objects.get(user__pk=request.user.id)
             course = Course.objects.get(pk=ids[s])
             obj = TakenCourse.objects.create(student=student, course=course)
             obj.save()
-            # total_courses = 0
-            # for i in obj:
-            #     total_courses += int(i.course.courseUnit)
-            # if total_courses < 16:
-            #     messages.error(request, 'You need minimum of 16 units of course \
-            #         load to continue!!')
-            #     return redirect('course_registration')
-            # elif total_courses > 24:
-            #     messages.error(request, 'The maximum course load is 24 units!! \
-            #         please try again!!')
-            #     return redirect('course_registration')
+        current_semester = Semester.objects.get(is_current_semester=True)
+        student = Student.objects.get(user__pk=request.user.id)
+        taken_courses = TakenCourse.objects.filter(
+            student__user__id=request.user.id, course__semester=current_semester)
+        t = ()
+        for i in taken_courses:
+            t += (i.course.pk, )
+        registered_courses = Course.objects.filter(level=student.level, semester=current_semester).filter(
+            id__in=t)
+        total_registered_unit = 0
+        for i in registered_courses:
+            total_registered_unit += int(i.courseUnit)
+        if total_registered_unit < 16:
+            obj.delete()
+            messages.error(request, 'You need minimum of 16 units of course \
+                load to continue!!')
+            return redirect('course_registration')
+        elif total_registered_unit > 24:
+            obj.delete()
+            messages.error(request, 'The maximum course load is 24 units!! \
+                please try again!!')
+            return redirect('course_registration')
+        else:
             messages.success(request, 'Courses Registered Successfully!')
-        return redirect('registered_courses')
+            return redirect('registered_courses')
     else:
         current_semester = Semester.objects.get(is_current_semester=True)
         student = Student.objects.get(user__pk=request.user.id)
@@ -813,9 +826,11 @@ def course_registration(request):
 @login_required
 @student_required
 def registered_courses(request):
+    current_semester = Semester.objects.get(is_current_semester=True)
     level = Student.objects.get(user__pk=request.user.id)
     courses = TakenCourse.objects.filter(student__user__id=request.user.id,
-                                         course__level=level.level)
+                                         course__level=level.level,
+                                         course__semester=current_semester)
     context = {
         'courses': courses,
         'level': level,
@@ -1066,19 +1081,60 @@ def add_score_for(request, id):
                                              cgpa=cgpa,
                                              session=current_semester.session)
         messages.success(request, 'Successfully Uploaded and Recorded')
-        return HttpResponseRedirect(
-            reverse_lazy('add_score_for', kwargs={'id': id}))
-    return HttpResponseRedirect(
-        reverse_lazy('add_score_for', kwargs={'id': id})
-    )
+    #     return HttpResponseRedirect(
+    #         reverse_lazy('add_score_for', kwargs={'id': id}))
+    # return HttpResponseRedirect(
+    #     reverse_lazy('add_score_for', kwargs={'id': id})
+    # )
+    return redirect('add_score')
 
 
 @login_required
 @lecturer_required
-def scoresheet_download(request):
+def scoresheet_download(request, id):
     """A function that handles scoresheet template download for lecturers"""
     response = HttpResponse(content_type='text/csv')
     response['Content-Disposition'] = 'attachment; filename="scoresheet.csv"'
     writer = csv.writer(response)
-    writer.writerow(['Matric No', 'CA', 'Exam'])
+
+    current_semester = Semester.objects.get(is_current_semester=True)
+    course = TakenCourse.objects.filter(course__id=id)
+    # title = [['ADELEKE UNIVERSITY, EDE'],
+    #          [f'{current_semester.session} ACADEMIC SESSION'],
+    #          [f'{current_semester} Semester'],
+    #          [f'{course.course.courseTitle} ({course.course.courseCode} - {course.course.courseUnit}Unit)'],
+    #          [f'{course.course.level} Level']
+    #         ]
+    header = [['ADELEKE UNIVERSITY, EDE'],
+             [f'{current_semester.session} ACADEMIC SESSION'],
+             [f'{current_semester} Semester'],
+             [f'{i.course.courseTitle} ({i.course.courseCode} - {i.course.courseUnit}Unit)' for i in course],
+             [f'{i.course.level} Level' for i in course]
+             ]
+
+    content = [['', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', ''],
+              ['', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', ''],
+              ['', '', '', '', '', 'Break Down', '', '', '', '', '', '', '', '', '', '', ''],
+              ['', '', '', 'Summary', '', 'Continous Assessment', '',
+                  '', '', '', 'Examination', '', '', '', '', '', ''],
+              ['', '', '', 'Score', '', 'Att.', 'ASSIGN.', 'Quiz', 'Test',
+                  'Total', 'Q1', 'Q2', 'Q3', 'Q4', 'Q5', 'Q6', 'Total'],
+              ['S/N', 'NAMES', 'MATRIC NO', '100', 'Grade', '5', '10', '10',
+                  '15', '40', '15', '15', '15', '15', '15', '15', '60']
+              ]
+    
+    alc = CourseAllocation.objects.get(courses__allocated_course__lecturer__pk=request.user.id, courses__pk=id)
+    footer = [['', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', ''],
+              ['', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', ''],
+              [f'Lecturer\'s Name: {alc.lecturer.get_full_name()}', '', 'HOD\'s Name: ................................', '', 'Dean\'s NAME: ................................', '' '', '', '', '', '', '', '', '', '', '', ''],
+              ['', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', ''],
+              ['Signature: ................', '', 'Signature: ................', '', 'Signature: ................', '', '', '', '', '', '', '', '', '', '', '', '']
+             ] 
+    sn = 1
+    for i in course:
+        content.append([sn, i.student.user.get_full_name(), i.student.id_number, '', '', '', '', '', '', '', '', '', '', '', '', '', ''])
+        sn += 1
+    writer.writerows(header)
+    writer.writerows(content)
+    writer.writerows(footer)
     return response
