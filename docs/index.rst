@@ -14,8 +14,8 @@ Table of Contents
    .. toctree::
       :maxdepth: 2
    
-   getting started
-   overview
+      getting started
+      overview
 
 Indices and tables
 ==================
