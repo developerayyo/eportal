@@ -53,13 +53,11 @@ Students
     * Register for courses.
     * View their registered courses.
     * View their result.
+    * Restrict Students from Registering courses if they did'nt meet course registration requirements.
     * Change their password.
 * ToDo:
     * Switch from one session or semester to another.
     * Add Cumulative points to results printout.
-    * Restrict Students from Registering courses if they did'nt meet course registration
-        requirements.
-    * Restrict access to printing Result until the administrator Released it.
     * Add wiki-how section to their view where they can learn how their view works.
 
 Lecturers
@@ -68,10 +66,10 @@ Lecturers
 * Finished:
     * View List of allocated Courses in the `Profile Section`
     * Upload Scoresheet for each course allocated to them
-    * Change their password
-* ToDo:
     * Use the School Standard Scoresheet Template
     * Lecturers should be able to download the scoresheet template for each courses allocated to them.
+    * Change their password
+* ToDo:
     * Add wiki-how section to their view where they can learn how their view works.
 
 Administrator
@@ -89,6 +87,7 @@ Administrator
     * Possession of a copy of user details after bulk user uploaded is completed.
     * Add export to PDF, Excel and CSV functionality to various views where they are needed.
     * Add FilterBy Functionality.
+    * Add a toggle button to Administrator view that allows him to reveal or hide Result.
 
 Proposed Enhancements
 =====================
