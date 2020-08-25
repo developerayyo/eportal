@@ -48,14 +48,14 @@ SOFTWARE.
 
 Contact
 =======
-Question? Please contact babalolapeter@icloud.com
+Question? Please contact peterbabalola@eportalproject.ml
 
 Need Help?
 ==========
 
-If you have any trouble with the Project please email babalolapeter@icloud.com
+If you have any trouble with the Project please email help@eportalproject.ml
 
 Need Further Help?
 ^^^^^^^^^^^^^^^^^^
 
-Please join our RSC Channel on freenode under devay
+Please join our Slack Channel on https://eportalproject.slack.com
