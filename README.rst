@@ -2,7 +2,7 @@
 Automated Course Registratiion and Result Processing System (ACRRPS)
 ====================================================================
 
-|repo-size| |licence| |website| |docs|
+|repo-size| |licence| |website| |docs| |codecov|
 
 **ACRRPS** is a Project I developed *(with Python and Django Web Framework)* in partial fulfilment of the requirements for the award of Bachelor's degree in Computer Science of **Adeleke University Ede, Nigeria**.
 
@@ -68,3 +68,7 @@ Want to Contribute
 .. |docs| image:: https://img.shields.io/readthedocs/eportalproject
     :alt: Read the Docs
     :target: https://docs.eportalproject.ml 
+
+.. |codecov| image:: https://codecov.io/gh/developerayyo/eportal/branch/master/graph/badge.svg
+  :target: https://codecov.io/gh/developerayyo/eportal
+
