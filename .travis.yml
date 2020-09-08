@@ -26,6 +26,9 @@ before_script: # => 6
 script:
   - python manage.py test
 
+script:
+  - coverage run portal/tests.py
+
 # Push the results back to codecov
 after_success:
   - codecov
