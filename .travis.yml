@@ -11,7 +11,7 @@ sudo: false
 python: 3.8
 
 services: # => 3 
-    - postgresql
+    - mysql
 env: # => 4
     -DJANGO=3.1 DB=mysql
 
@@ -20,7 +20,7 @@ install:
   - pip install -r requirements.txt
 
 before_script: # => 6
-    - postgresql -e 'create database test;' -u root
+    - mysql -e 'create database test;' -u root
 
 # Run the unit test
 script:
