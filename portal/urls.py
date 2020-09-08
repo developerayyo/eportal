@@ -78,5 +78,4 @@ urlpatterns = [
     path('scoresheet/download/<int:id>/', views.scoresheet_download, name='scoresheet_download'),
     path('results/', views.result, name='result'),
     path('toggles/', views.toggles),
-#     path('student/session/edit/<int:pk>/', views.student_session_update_view, name="student_edit_session"),
 ]

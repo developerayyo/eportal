@@ -1192,4 +1192,3 @@ def toggles(request):
     w.toggle = request.POST['toggle'] == 'true'
     w.save()
     return HttpResponse('success')
-
