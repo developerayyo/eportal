@@ -15,8 +15,9 @@ python: 3.8
 # Install the codecov pip dependency
 install:
   - pip install codecov
+  - pip install django
 
-# Run the unit test
+Run the unit test
 script:
   - coverage run portal/tests.py
 
