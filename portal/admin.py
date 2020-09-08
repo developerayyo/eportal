@@ -4,7 +4,7 @@ from django.contrib import admin
 
 from .models import (
     User, Student, CarryOverStudent, RepeatingStudent, Course,
-    TakenCourse, Result, Semester, CourseAllocation, Session
+    TakenCourse, Result, Semester, CourseAllocation, Session, ResultRender
 )
 
 admin.site.register(User)
@@ -37,3 +37,4 @@ class ResultAdmin(admin.ModelAdmin):
 admin.site.register(TakenCourse, ScoreAdmin)
 admin.site.register(Result, ResultAdmin)
 # admin.site.register(Result, ResultResource)
+admin.site.register(ResultRender)

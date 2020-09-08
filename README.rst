@@ -12,7 +12,7 @@ Although **ACRRPS** is still much more in development, it has been deployed with
 Documentation
 =============
 
-I make use of Readthedocs.io to manage the documentation and you can click `here <https://eportalproject.readthedocs.io/en/latest/index.html>`_ to dive into the project documentation.
+I make use of Readthedocs.io to manage the documentation and you can click `docs <https://eportalproject.readthedocs.io/en/latest/index.html>`_ to dive into the project documentation.
 
 
 Installation

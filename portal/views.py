@@ -2,6 +2,7 @@ import csv
 import io
 import weasyprint
 from itertools import islice
+from decouple import config
 
 from django.shortcuts import redirect, render, get_object_or_404
 from django.contrib.auth import update_session_auth_hash, get_user_model
@@ -16,15 +17,21 @@ from django.template.loader import render_to_string
 from django.conf import settings
 from django.urls import reverse_lazy
 
-from .tasks import default_password, default_password_staff
+from .tasks import default_password_mail, default_password_staff
 from .decorators import lecturer_required, admin_required, student_required
 from .forms import (
     ProfileForm, StaffAddForm, StudentAddForm, SessionForm,
-    SemesterForm, CourseAddForm, CourseAllocationForm)
+    SemesterForm, CourseAddForm, CourseAllocationForm, StudentSessionForm)
 from .models import (
     User, Student, CarryOverStudent, RepeatingStudent, Course,
-    TakenCourse, Result, Semester, CourseAllocation, Session
+    TakenCourse, Result, Semester, CourseAllocation, Session,
+    ResultRender
 )
+
+from twilio.rest import Client
+account_sid = config('account_sid')
+auth_token = config('auth_token')
+client = Client(account_sid, auth_token)
 
 
 @login_required
@@ -41,7 +48,9 @@ def home(request):
     no_of_1st_class_students = Result.objects.filter(cgpa__gte=4.5).count()
     no_of_carry_over_students = CarryOverStudent.objects.all().count()
     no_of_students_to_repeat = RepeatingStudent.objects.all().count()
-
+    # session = Session.objects.all()
+    form = StudentSessionForm()
+    
     context = {
         "no_of_students": students,
         "no_of_staff": staff,
@@ -50,6 +59,7 @@ def home(request):
         "no_of_students_to_repeat": no_of_students_to_repeat,
         "no_of_carry_over_students": no_of_carry_over_students,
         current_semester: current_semester,
+        "form": form,
     }
 
     return render(request, 'result/home.html', context)
@@ -62,7 +72,7 @@ def profile(request):
     if request.user.is_lecturer:
         courses = Course.objects.filter(
             allocated_course__lecturer__pk=request.user.id).filter(
-                semester=current_semester)
+            semester=current_semester)
         return render(request, 'account/profile.html', {
             "courses": courses,
         })
@@ -91,7 +101,7 @@ def user_profile(request, id):
     if user.is_lecturer:
         courses = Course.objects.filter(
             allocated_course__lecturer__pk=id).filter(
-                semester=current_semester)
+            semester=current_semester)
         context = {
             "user": user,
             "courses": courses,
@@ -166,7 +176,7 @@ def get_chart(request, *args, **kwargs):
     for i in levels:
         # gather all the courses registered by the students of the current
         # level in the loop
-        all_query_score += (TakenCourse.objects.filter(student__level=i), )
+        all_query_score += (TakenCourse.objects.filter(student__level=i),)
 
     # for level #100
     first_level_total = 0
@@ -226,7 +236,7 @@ def get_chart(request, *args, **kwargs):
 
 
 @login_required
-@lecturer_required
+@admin_required
 def course_list(request):
     """ Show list of all registered courses in the system """
     courses = Course.objects.all()
@@ -237,7 +247,7 @@ def course_list(request):
 
 
 @login_required
-@lecturer_required
+@admin_required
 def student_list(request):
     """ Show list of all registered students in the system """
     students = Student.objects.all()
@@ -250,7 +260,7 @@ def student_list(request):
 
 
 @login_required
-@lecturer_required
+@admin_required
 def staff_list(request):
     """ Show list of all registered staff """
     staff = User.objects.filter(is_student=False)
@@ -263,7 +273,7 @@ def staff_list(request):
 
 
 @login_required
-@lecturer_required
+@admin_required
 def session_list_view(request):
     """ Show list of all sessions """
     sessions = Session.objects.all().order_by('-session')
@@ -273,7 +283,7 @@ def session_list_view(request):
 
 
 @login_required
-@lecturer_required
+@admin_required
 def session_add_view(request):
     """
     check request method, if POST we add session otherwise
@@ -291,7 +301,7 @@ def session_add_view(request):
 
 
 @login_required
-@lecturer_required
+@admin_required
 def session_update_view(request, pk):
     session = Session.objects.get(pk=pk)
     if request.method == 'POST':
@@ -316,7 +326,7 @@ def session_update_view(request, pk):
 
 
 @login_required
-@lecturer_required
+@admin_required
 def session_delete_view(request, pk):
     session = get_object_or_404(Session, pk=pk)
     if session.is_current_session == True:
@@ -329,7 +339,7 @@ def session_delete_view(request, pk):
 
 
 @login_required
-@lecturer_required
+@admin_required
 def semester_list_view(request):
     semesters = Semester.objects.all().order_by('-session')
     return render(request, 'result/manage_semester.html', {
@@ -338,7 +348,7 @@ def semester_list_view(request):
 
 
 @login_required
-@lecturer_required
+@admin_required
 def semester_add_view(request):
     if request.method == 'POST':
         form = SemesterForm(request.POST)
@@ -353,7 +363,7 @@ def semester_add_view(request):
                     if Semester.objects.get(semester=semester, session=ss):
                         messages.info(
                             request, semester + " semester in " +
-                            session.session + " session already exist")
+                                     session.session + " session already exist")
                         return redirect('create_new_semester')
                 except:
                     semester = Semester.objects.get(is_current_semester=True)
@@ -369,7 +379,7 @@ def semester_add_view(request):
 
 
 @login_required
-@lecturer_required
+@admin_required
 def semester_update_view(request, pk):
     semester = Semester.objects.get(pk=pk)
     if request.method == 'POST':
@@ -402,7 +412,7 @@ def semester_update_view(request, pk):
 
 
 @login_required
-@lecturer_required
+@admin_required
 def semester_delete_view(request, pk):
     semester = get_object_or_404(Semester, pk=pk)
     if semester.is_current_semester == True:
@@ -459,7 +469,7 @@ def StaffAddView(request):
 
 
 @login_required
-@lecturer_required
+@admin_required
 def edit_staff(request, pk):
     staff = get_object_or_404(User, pk=pk)
     if request.method == "POST":
@@ -473,7 +483,7 @@ def edit_staff(request, pk):
 
 
 @login_required
-@lecturer_required
+@admin_required
 def delete_staff(request, pk):
     staff = get_object_or_404(User, pk=pk)
     staff.delete()
@@ -481,6 +491,7 @@ def delete_staff(request, pk):
 
 
 @login_required
+@admin_required
 def StudentAddView(request):
     """A function that add users details to the database from a CSV file"""
     template = "registration/add_student.html"
@@ -525,7 +536,8 @@ def StudentAddView(request):
                 department=column[4],
                 faculty=column[5])
             # lauch celery task
-            default_password.delay(column[2], raw_password)
+            default_password_mail.delay(column[2], raw_password)
+            default_password_sms(column[2], raw_password)
             # response = HttpResponse(csv_file_w, content_type='text/csv')
             # response['Content-Disposition'] = 'attachment; filename="student_details.csv"'
             # writer = csv.writer(response)
@@ -536,9 +548,24 @@ def StudentAddView(request):
     context = {}
     return render(request, template, context)
 
+def default_password_sms(id_number, pwd):
+    """
+    Task to send auto-generated passwords to student's e-mail
+    """
+    student = Student.objects.get(id_number=id_number)
+    message = client.messages \
+        .create(
+            messaging_service_sid=config('messaging_service_sid'),
+            body=f'Dear {student.user.first_name},\n\n'
+            f'You have been successfully Registered to University Eportal.'
+            f'Your Matric Number is: {id_number} and '
+            f'Your Password is: {pwd}',
+            to=student.user.phone
+        )
+    return message
 
 @login_required
-@lecturer_required
+@admin_required
 def edit_student(request, pk):
     student = get_object_or_404(Student, pk=pk)
     if request.method == "POST":
@@ -552,7 +579,7 @@ def edit_student(request, pk):
 
 
 @login_required
-@lecturer_required
+@admin_required
 def delete_student(request, pk):
     student = get_object_or_404(Student, pk=pk)
     student.delete()
@@ -593,7 +620,7 @@ def CourseAddView(request):
 
 
 @login_required
-@lecturer_required
+@admin_required
 def course_edit(request, pk):
     course = get_object_or_404(Course, pk=pk)
     if request.method == "POST":
@@ -607,7 +634,7 @@ def course_edit(request, pk):
     return render(request, 'course/course_form.html', {'form': form})
 
 
-@method_decorator([login_required, lecturer_required], name='dispatch')
+@method_decorator([login_required, admin_required], name='dispatch')
 class CourseAllocationView(CreateView):
     form_class = CourseAllocationForm
     template_name = 'course/course_allocation.html'
@@ -623,7 +650,7 @@ class CourseAllocationView(CreateView):
         selected_courses = form.cleaned_data['courses']
         courses = ()
         for course in selected_courses:
-            courses += (course.pk, )
+            courses += (course.pk,)
         print(courses)
 
         try:
@@ -668,7 +695,7 @@ def course_allocation_upload(request):
 
 
 @login_required
-@lecturer_required
+@admin_required
 def delete_course(request, pk):
     course = get_object_or_404(Course, pk=pk)
     course.delete()
@@ -677,7 +704,7 @@ def delete_course(request, pk):
 
 
 @login_required
-@lecturer_required
+@admin_required
 def course_allocation_view(request):
     allocated_courses = CourseAllocation.objects.all()
     return render(request, 'course/course_allocation_view.html',
@@ -685,7 +712,7 @@ def course_allocation_view(request):
 
 
 @login_required
-@lecturer_required
+@admin_required
 def withheld_course(request, pk):
     course = CourseAllocation.objects.get(pk=pk)
     course.delete()
@@ -694,13 +721,14 @@ def withheld_course(request, pk):
 
 
 @login_required
+@admin_required
 def carry_over(request):
     if request.method == "POST":
         value = ()
         data = request.POST.copy()
         data.pop('csrfmiddlewaretoken', None)  # remove csrf_token
         for val in data.values():
-            value += (val, )
+            value += (val,)
         course = value[0]
         session = value[1]
         courses = CarryOverStudent.objects.filter(course__courseCode=course,
@@ -725,12 +753,14 @@ def carry_over(request):
 
 
 @login_required
+@admin_required
 def repeat_list(request):
     students = RepeatingStudent.objects.all()
     return render(request, 'students/repeaters.html', {"students": students})
 
 
 @login_required
+@admin_required
 def first_class_list(request):
     students = Result.objects.filter(cgpa__gte=4.5)
     return render(request, 'students/first_class_students.html',
@@ -745,7 +775,7 @@ def course_registration(request):
         data = request.POST.copy()
         data.pop('csrfmiddlewaretoken', None)  # remove csrf_token
         for key in data.keys():
-            ids = ids + (str(key), )
+            ids = ids + (str(key),)
         obj = None
         for s in range(0, len(ids)):
             student = Student.objects.get(user__pk=request.user.id)
@@ -758,7 +788,7 @@ def course_registration(request):
             student__user__id=request.user.id, course__semester=current_semester)
         t = ()
         for i in taken_courses:
-            t += (i.course.pk, )
+            t += (i.course.pk,)
         registered_courses = Course.objects.filter(level=student.level, semester=current_semester).filter(
             id__in=t)
         total_registered_unit = 0
@@ -784,7 +814,7 @@ def course_registration(request):
             student__user__id=request.user.id, course__semester=current_semester)
         t = ()
         for i in taken_courses:
-            t += (i.course.pk, )
+            t += (i.course.pk,)
         courses = Course.objects.filter(
             level=student.level, semester=current_semester).exclude(id__in=t)
         all_courses = Course.objects.filter(
@@ -847,7 +877,7 @@ def course_drop(request):
         data = request.POST.copy()
         data.pop('csrfmiddlewaretoken', None)  # remove csrf_token
         for key in data.keys():
-            ids = ids + (str(key), )
+            ids = ids + (str(key),)
         for s in range(0, len(ids)):
             student = Student.objects.get(user__pk=request.user.id)
             course = Course.objects.get(pk=ids[s])
@@ -860,6 +890,7 @@ def course_drop(request):
 @login_required
 @student_required
 def view_result(request):
+    w = ResultRender.objects.get()
     student = Student.objects.get(user__pk=request.user.id)
     current_semester = Semester.objects.get(is_current_semester=True)
     courses = TakenCourse.objects.filter(student__user__pk=request.user.id,
@@ -882,6 +913,7 @@ def view_result(request):
         current_CGPA = 0
 
     context = {
+        'w': w,
         "courses": courses,
         "result": result,
         "student": student,
@@ -903,7 +935,7 @@ def course_registration_pdf(request):
         student__user__id=request.user.id, course__semester=current_semester)
     t = ()
     for i in taken_courses:
-        t += (i.course.pk, )
+        t += (i.course.pk,)
         registered_courses = Course.objects.filter(level=student.level, semester=current_semester).filter(
             id__in=t)
         total_registered_unit = 0
@@ -930,6 +962,7 @@ def course_registration_pdf(request):
 @student_required
 def result_pdf(request):
     """View that allows student to print their result"""
+    w = ResultRender.objects.get()
     student = Student.objects.get(user__pk=request.user.id)
     current_semester = Semester.objects.get(is_current_semester=True)
     current_session = Session.objects.get(is_current_session=True)
@@ -953,7 +986,7 @@ def result_pdf(request):
     # cps = 0
     t = ()
     for i in courses:
-        t += (i.course.pk, )
+        t += (i.course.pk,)
         registered_courses = Course.objects.filter(level=student.level).filter(
             id__in=t)
         total_registered_unit = 0
@@ -978,7 +1011,10 @@ def result_pdf(request):
     weasyprint.HTML(string=html, base_url=request.build_absolute_uri()).write_pdf(
         response,
         stylesheets=[weasyprint.CSS(settings.STATIC_ROOT + '/css/resultpdf.css')])
-    return response
+    if w.toggle:
+        return response
+    else:
+        return HttpResponse('Result not available for printing yet!!!!')
 
 
 @login_required
@@ -1112,9 +1148,9 @@ def scoresheet_download(request, id):
 
     content = [['', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', ''],
                ['', '', '', '', '', '', '', '', '',
-                   '', '', '', '', '', '', '', ''],
+                '', '', '', '', '', '', '', ''],
                ['', '', '', '', '', 'Break Down', '', '',
-                   '', '', '', '', '', '', '', '', ''],
+                '', '', '', '', '', '', '', '', ''],
                ['', '', '', 'Summary', '', 'Continous Assessment', '',
                 '', '', '', 'Examination', '', '', '', '', '', ''],
                ['', '', '', 'Score', '', 'Att.', 'ASSIGN.', 'Quiz', 'Test',
@@ -1131,7 +1167,7 @@ def scoresheet_download(request, id):
                '', 'Dean\'s NAME: ................................', '' '', '', '', '', '', '', '', '', '', '', ''],
               ['', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', ''],
               ['Signature: ................', '', 'Signature: ................', '',
-                  'Signature: ................', '', '', '', '', '', '', '', '', '', '', '', '']
+               'Signature: ................', '', '', '', '', '', '', '', '', '', '', '', '']
               ]
     sn = 1
     for i in course:
@@ -1142,3 +1178,18 @@ def scoresheet_download(request, id):
     writer.writerows(content)
     writer.writerows(footer)
     return response
+
+@login_required
+@admin_required
+def result(request):
+    w, created = ResultRender.objects.get_or_create(id=1)
+    return render(request, 'result/result.html', {'result_render': w})
+
+@login_required
+@admin_required
+def toggles(request):
+    w = ResultRender.objects.get(id=request.POST['id'])
+    w.toggle = request.POST['toggle'] == 'true'
+    w.save()
+    return HttpResponse('success')
+

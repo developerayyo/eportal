@@ -2,6 +2,7 @@ from django.db import models
 from django.contrib.auth.models import AbstractUser
 from django.conf import settings
 from django.urls import reverse
+from django.core.validators import RegexValidator
 
 from .validators import ASCIIUsernameValidator
 
@@ -119,7 +120,8 @@ class User(AbstractUser):
     """
     is_student = models.BooleanField(default=False)
     is_lecturer = models.BooleanField(default=False)
-    phone = models.CharField(max_length=60, blank=True, null=True)
+    phone_regex = RegexValidator(regex=r'^\+?1?\d{9,15}$', message="Phone number must be entered in the format: '+999999999'. Up to 15 digits allowed.")
+    phone = models.CharField(validators=[phone_regex], max_length=15, blank=True, null=True)
     address = models.CharField(max_length=60, blank=True, null=True)
     picture = models.ImageField(upload_to="pictures/", blank=True, null=True)
     email = models.EmailField(blank=True, null=True)
@@ -377,3 +379,7 @@ class Result(models.Model):
     semester = models.CharField(max_length=100, choices=SEMESTER)
     session = models.CharField(max_length=100, blank=True, null=True)
     level = models.CharField(max_length=100, choices=LEVEL)
+
+
+class ResultRender(models.Model):
+    toggle = models.BooleanField(default=False, blank=True, null=True)

@@ -49,12 +49,12 @@
                     <ul class="navbar-nav mr-auto"></ul>
                     <ul class="navbar-nav nav-flex-icons">
                         <li class="nav-item">
-                            <a href="{% if request.user.is_superuser %}{% url 'manage_semester' %}{% else %}#{% endif %}" class="nav-link border border-light grey-text rounded waves-effect">
+                            <a href="{% if request.user.is_superuser %}{% url 'manage_semester' %}{% else %}#{% endif %}" {% if request.user.is_student %} data-toggle="modal" data-target="#show_semester_modal" {% endif %} class="nav-link border border-light grey-text rounded waves-effect">
                                 <i class="fa fa-cogs mr-3"></i>{{ current_semester }} Semester
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a href="{% if request.user.is_superuser %}{% url 'manage_session' %}{% else %}#{% endif %}" class="nav-link border border-light rounded waves-effect{% if request.user.is_superuser %} green-text {% else %} grey-text {% endif %}">
+                            <a href="{% if request.user.is_superuser %}{% url 'manage_session' %}{% else %}#{% endif %}"{% if request.user.is_student %} data-toggle="modal" data-target="#show_session_modal" {% endif %} class="nav-link border border-light rounded waves-effect{% if request.user.is_superuser %} green-text {% else %} grey-text {% endif %}">
                                 <i class="fa fa-cogs mr-3"></i>{{ current_session }}
                             </a>
                         </li>
@@ -120,6 +120,7 @@
     <!-- SCRIPTS -->
     <!-- JQuery -->
     <script type="text/javascript" src="{% static 'js/jquery-3.3.1.min.js' %}"></script>
+    <script type="text/javascript" src="{% static 'js/test.js' %}"></script>
     <!-- Bootstrap tooltips -->
     <script type="text/javascript" src="{% static 'js/popper.min.js' %}"></script>
     <!-- Bootstrap core JavaScript -->
@@ -128,8 +129,13 @@
     <script type="text/javascript" src="{% static 'js/mdb.min.js' %}"></script>
     <script type="text/javascript" src="{% static 'js/tooltips.js' %}"></script>
      <script src="https://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
-     {% block js %}
-
+    {% block js %}
     {% endblock js %}
+    <script>
+        $(document).ready(function() {
+          {% block domready %}
+          {% endblock %}
+        });
+    </script>
     </body>
 </html>

@@ -3,8 +3,8 @@
 {% block title %} ACRRPS | Dashboard {% endblock title %}
 
 {% block js %}
-<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.3/Chart.min.js" integrity="sha256-oSgtFCCmHWRPQ/JmR4OoZ3Xke1Pw4v50uh6pLcu+fIc=" crossorigin="anonymous"></script>
-
+{% comment %} <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.3/Chart.min.js" integrity="sha256-oSgtFCCmHWRPQ/JmR4OoZ3Xke1Pw4v50uh6pLcu+fIc=" crossorigin="anonymous"></script> {% endcomment %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js@2.8.0"></script>
 <script type="text/javascript">
         var endpoint = 'api/data/'
         var default_level_average = []
@@ -102,6 +102,79 @@
 </script>
 {% endblock js %}
 {% block content %}
+        <!-- Modal -->
+    <form>
+      <div class="modal fade" id="show_semester_modal">
+        <div class="modal-dialog">
+          <div class="modal-content">
+            <div class="modal-header">
+              <p class="modal-title">Switch Semester!!</p>
+              <button class="close" data-dismiss="modal">
+                <span aria-hidden="true">&times;</span>
+              </button>
+            </div>
+            <div class="modal-body">
+                <label for="user">Semester:</label>
+                <input type="text" class="form-control" placeholder="enter semester" id="user">
+            </div>
+            <div class="modal-footer">
+              <button class="btn btn-info">Switch</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </form>
+    {% comment %} <form role="form" class="form-horizontal" method="post" action="" enctype="multipart/form-data">{% csrf_token %}
+      <div class="modal fade" id="show_session_modal">
+        <div class="modal-dialog">
+          <div class="modal-content">
+            <div class="modal-header">
+              <p class="modal-title">Switch Session!!</p>
+              <button class="close" data-dismiss="modal">
+                <span aria-hidden="true">&times;</span>
+              </button>
+            </div>
+            <div class="modal-body">
+                <label for="user">Session:</label>
+                <input type="text" class="form-control" placeholder="enter session" id="user">
+            </div>
+            <div class="modal-footer">
+              <button class="btn btn-info">Switch</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </form> {% endcomment %}
+    <form role="form" class="form-horizontal" method="post" action="" enctype="multipart/form-data">{% csrf_token %}
+      <div class="modal fade" id="show_session_modal">
+        <div class="modal-dialog">
+          <div class="modal-content">
+            <div class="modal-header">
+              <p class="modal-title">Switch Session!!</p>
+              <button class="close" data-dismiss="modal">
+                <span aria-hidden="true">&times;</span>
+              </button>
+            </div>
+            <div class="modal-body">
+            {% for field in form.visible_fields %}
+            <label for="{{ field.label }}" class="col-sm-2 control-label">{{ field.label }}</label>
+                {% comment %} <input type="text" class="form-control" placeholder="enter session" id="user"> {% endcomment %}
+            {{ field }}
+              {% if field.help_text %}
+                <span class="help-block">{{ field.help_text }}</span>
+              {% endif %}
+              {% for error in field.errors %}
+                <label class="control-label">{{ error }}</label>
+              {% endfor %}
+            </div>
+        {% endfor %}
+            <div class="modal-footer">
+              <button class="btn btn-info">Switch</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </form>
  <div class="container-fluid mt-5">
             {% if request.user.is_superuser %}
             <!--Grid row-->

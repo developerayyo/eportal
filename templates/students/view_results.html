@@ -24,6 +24,7 @@ overflow-y: auto;
 -ms-overflow-style: -ms-autohiding-scrollbar;
 }
 </style>
+{% if w.toggle %}
 <div class="table-wrapper-scroll-y">
   {% comment %} {% if   %}
     <div>
@@ -105,6 +106,7 @@ overflow-y: auto;
 
   </tr>
 </tbody>
+{% endif %}
 </div>
 <br>
 {% endblock %}

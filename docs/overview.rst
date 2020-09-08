@@ -54,10 +54,10 @@ Students
     * View their registered courses.
     * View their result.
     * Restrict Students from Registering courses if they did'nt meet course registration requirements.
+    * Restrict Students from viewing or printing their result while the administrator has not release the result yet.
     * Change their password.
 * ToDo:
     * Switch from one session or semester to another.
-    * Add Cumulative points to results printout.
     * Add wiki-how section to their view where they can learn how their view works.
 
 Lecturers
@@ -82,12 +82,11 @@ Administrator
     * Upload Courses to the site from a `csv file`.
     * Upload course allocation list to the site from a `csv file` or allocate courses directly on the site. 
     * Change password.
-    * Change Session and Semester Settings
+    * Change current Session/Semester for the whole school.
+    * Add a toggle button to Administrator view that allows him to reveal or hide Result.
 * ToDo:
-    * Possession of a copy of user details after bulk user uploaded is completed.
     * Add export to PDF, Excel and CSV functionality to various views where they are needed.
     * Add FilterBy Functionality.
-    * Add a toggle button to Administrator view that allows him to reveal or hide Result.
 
 Proposed Enhancements
 =====================

@@ -6,7 +6,7 @@ from .models import User
 
 
 @task
-def default_password(id_number, pwd):
+def default_password_mail(id_number, pwd):
     """
     Task to send auto-generated passwords to student's e-mail
     """
@@ -17,7 +17,7 @@ def default_password(id_number, pwd):
               f'Your Matric Number is: {id_number}' \
               f'Your Password is: {pwd}'
     mail_sent = send_mail(
-        subject, message, 'noreply@eportalproject.com', [student.user.email])
+        subject, message, 'noreply@eportalproject.ml', [student.user.email])
 
     return mail_sent
 
@@ -33,6 +33,6 @@ def default_password_staff(username, pwd):
               f'Your Username is: {username}' \
               f'Your Password is: {pwd}'
     mail_sent = send_mail(
-        subject, message, 'noreply@eportalproject.com', [staff.email])
+        subject, message, 'noreply@eportalproject.ml', [staff.email])
 
     return mail_sent

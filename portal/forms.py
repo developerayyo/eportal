@@ -5,7 +5,7 @@ from django.forms import BaseModelFormSet
 
 from .models import (
     TakenCourse, LEVEL, Student, User, Course, SEMESTER,
-    User, CourseAllocation, Session, Semester
+    CourseAllocation, Session, Semester
 )
 
 
@@ -287,6 +287,19 @@ class CourseAllocationForm(forms.ModelForm):
 
 
 class SessionForm(forms.ModelForm):
+    class Meta:
+        model = Session
+        fields = ['session']
+
+
+class StudentSessionForm(forms.ModelForm):
+    session = forms.ModelChoiceField(
+        queryset=Session.objects.all(),
+        widget=forms.Select(attrs={
+            'class': 'browser-default custom-select',
+        }),
+        required=True)
+    
     class Meta:
         model = Session
         fields = ['session']

@@ -1,0 +1,39 @@
+{% extends 'base.html' %}
+
+{% block side_bar %}
+    {% include 'partial_active_element.html' with active='Result' %}
+{% endblock side_bar %}
+
+{% block title %}ACRRPS | Results{% endblock title %}
+
+{% block content %}
+<style type="text/css">
+  .table-wrapper-scroll-y {
+display: block;
+max-height: 350px;
+overflow-y: auto;
+-ms-overflow-style: -ms-autohiding-scrollbar;
+}
+</style>
+
+<div class="container-fluid mt-5">
+ <!-- Heading -->
+  <h6 class="mb-2 mb-sm-0 pt-1">
+    <label>Release Result?</label>
+    <label class="switch">
+        <input type="checkbox" id="checkbox" value="{{result_render.toggle}}>
+        <span class="slider round"></span>
+    </label>
+  </h6>
+</div>
+{% endblock %}
+
+{% block domready %}
+    $('#checkbox').change(function() {
+        $.post("/toggles/", {
+            id: '{{result_render.id}}', 
+            toggle: this.checked, 
+            csrfmiddlewaretoken: '{{ csrf_token }}' 
+        });
+    });
+{% endblock %}
