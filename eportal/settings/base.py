@@ -126,7 +126,7 @@ TEMPLATES[0]['OPTIONS']['context_processors'].append(
     "portal.context_processors.session_processor")
 
 
-EMAIL_SUBJECT_PREFIX = '[HelpTalent]'
+EMAIL_SUBJECT_PREFIX = 'EportalProject Support'
 EMAIL_PORT = config('EMAIL_PORT', cast=int)
 DEFAULT_FROM_EMAIL = config('DEFAULT_FROM_EMAIL')
 EMAIL_HOST = config('EMAIL_HOST')
