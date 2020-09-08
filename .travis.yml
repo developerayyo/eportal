@@ -1,3 +1,4 @@
+# Set the build language to Python
 language:
     python
 after_success:
@@ -6,20 +7,24 @@ after_success:
 # Disable sudo to speed up the build
 sudo: false
 
-# Set the build language to Python
-language: python
-
 # Set the python version to 3.8
 python: 3.8
 
+services: # => 3 
+    - postgresql
+env: # => 4
+    -DJANGO=3.1 DB=mysql
+
 # Install the codecov pip dependency
 install:
-  - pip install codecov
-  - pip install django
+  - pip install -r requirements.txt
 
-Run the unit test
+before_script: # => 6
+    - postgresql -e 'create database test;' -u root
+
+# Run the unit test
 script:
-  - coverage run portal/tests.py
+  - python manage.py test
 
 # Push the results back to codecov
 after_success:
