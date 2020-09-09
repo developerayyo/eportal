@@ -1,34 +1,20 @@
-# Set the build language to Python
-language:
-    python
-after_success:
-    - bash <(curl -s https://codecov.io/bash)
-
 # Disable sudo to speed up the build
 sudo: false
 
+# Set the build language to Python
+language: python
+
 # Set the python version to 3.8
 python: 3.8
-
-services: # => 3 
-    - mysql
-env: # => 4
-    -DJANGO=3.1 DB=mysql
 
 # Install the codecov pip dependency
 install:
   - pip install -r requirements.txt
 
-before_script: # => 6
-    - mysql -e 'create database test;' -u root
-
-# Run the unit test
+ # Run the unit test
 script:
-  - python manage.py test
-
-# script:
-#   - coverage run manage.py test
+  - coverage run manage.py test
 
 # Push the results back to codecov
-# after_success:
-#   - codecov 
+after_success:
+  - codecov
