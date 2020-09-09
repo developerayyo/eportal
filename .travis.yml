@@ -1,32 +1,36 @@
-# # Disable sudo to speed up the build
-# sudo: false
+# Set the build language to Python
+language:
+    python
 
-# # Set the build language to Python
-# language: python
+# Disable sudo to speed up the build
+sudo: false
 
-# # Set the python version to 3.8
-# python: 3.8
+# Set the python version to 3.8
+python: 3.8
 
-# # Install the codecov pip dependency
-# install:
-#   - pip install -r requirements.txt
+services: # => 3 
+    - postgresql
+env: # => 4
+  global:
+    - DJANGO_SETTINGS_MODULE="eportal.settings.travis_settings"
+    - PYTHONPATH="/home/travis/build/developerayyo/eportal"
+    - PIP_USE_MIRRORS=true
+    # - BUILD_ON_TRAVIS=true
+  matrix:
+    -DJANGO=3.1 DB=postgresql
 
-#  # Run the unit test
-# script:
-#   - coverage run manage.py test
+# commands to install dependencies
+install:
+  - pip install -q Django==$DJANGO
+  - pip install -q -r requirements.txt
 
-# # Push the results back to codecov
-# after_success:
-#   - codecov
-language: python
-python:
-  - '3.8'
-  - 'nightly'
+before_script: # => 6
+  - psql -c "CREATE DATABASE travis_ci_db;" -U travis
 
-cache: pip
+ # Run the unit test
+script:
+  - coverage run manage.py test
 
-install: 'pip install pytest-cov -r requirements.txt'
-
-script: pytest --cov=.
-
-after_success: codecov
+# Push the results back to codecov
+after_success:
+    - bash <(curl -s https://codecov.io/bash)
