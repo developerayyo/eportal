@@ -1,20 +1,32 @@
-# Disable sudo to speed up the build
-sudo: false
+# # Disable sudo to speed up the build
+# sudo: false
 
-# Set the build language to Python
+# # Set the build language to Python
+# language: python
+
+# # Set the python version to 3.8
+# python: 3.8
+
+# # Install the codecov pip dependency
+# install:
+#   - pip install -r requirements.txt
+
+#  # Run the unit test
+# script:
+#   - coverage run manage.py test
+
+# # Push the results back to codecov
+# after_success:
+#   - codecov
 language: python
+python:
+  - '3.8'
+  - 'nightly'
 
-# Set the python version to 3.8
-python: 3.8
+cache: pip
 
-# Install the codecov pip dependency
-install:
-  - pip install -r requirements.txt
+install: 'pip install pytest-cov -r requirements.txt'
 
- # Run the unit test
-script:
-  - coverage run manage.py test
+script: pytest --cov=.
 
-# Push the results back to codecov
-after_success:
-  - codecov
+after_success: codecov
