@@ -27,8 +27,8 @@ script:
   - python manage.py test
 
 script:
-  - coverage run manage.py test -v 2
+  - coverage run manage.py test portal -v 2
 
 # Push the results back to codecov
 after_success:
-  - codecov
+  - codecov html
