@@ -11,23 +11,23 @@ sudo: false
 python: 3.8
 
 services: # => 3 
-    - mysql
+    - postgresql
 env: # => 4
-    -DJANGO=3.1 DB=mysql
+    -DJANGO=3.1 DB=postgresql
 
 # Install the codecov pip dependency
 install:
   - pip install -r requirements.txt
 
 before_script: # => 6
-    - mysql -e 'create database test;' -u root
+    - postgresql -e 'create database test;' -u root
 
 # Run the unit test
 script:
   - python manage.py test
 
 script:
-  - coverage run portal/tests.py
+  - coverage run manage.py test -v 2
 
 # Push the results back to codecov
 after_success:
