@@ -12,7 +12,7 @@ jobs:
       - python/install-deps
       - python/save-cache
       - run:
-          command: ./manage.py test --settings=eportal.settings.pro
+          command: ./manage.py test --settings=eportal.settings.circleci_settings
           name: Test
 
 workflows:
