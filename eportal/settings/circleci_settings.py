@@ -3,12 +3,5 @@ from . base import *
 SECRET_KEY = config("SECRET_KEY")
 DEBUG = False
 TEMPLATE_DEBUG = True
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'circle_test',
-        'USER': 'root',
-        'PASSWORD': '',
-        'HOST': '',
-    }
-}
+db_from_env = dj_database_url.config(conn_max_age=500)
+DATABASES['default'].update(db_from_env)
