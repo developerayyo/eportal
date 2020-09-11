@@ -6,9 +6,9 @@ TEMPLATE_DEBUG = True
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'travis_ci_db',
-        'USER': 'travis',
+        'NAME': 'circle_test',
+        'USER': 'root',
         'PASSWORD': '',
-        'HOST': '127.0.0.1',
+        'HOST': '',
     }
 }
