@@ -10,7 +10,7 @@ jobs:
       - image: circleci/python:3.8
         environment:
           DATABASE_URL: postgresql://root@localhost/circle_test?sslmode=disable
-      - image: circleci/postgres:12
+      - image: circleci/postgres:9.6.2
         environment:
           POSTGRES_USER: root
           POSTGRES_DB: circle_test
@@ -19,8 +19,6 @@ jobs:
       - python/load-cache
       - python/install-deps
       - python/save-cache
-      - run: sudo chown -R circleci:circleci /usr/local/bin
-      - run: sudo chown -R circleci:circleci /usr/local/lib/python3.6/site-packages
       - run:
           command: ./manage.py test --settings=eportal.settings.circleci_settings
           name: Test
