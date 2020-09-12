@@ -11,6 +11,7 @@
 command mv /home/ubuntu/eportal/env /home/ubuntu/env
 command mv /home/ubuntu/eportal/.env /home/ubuntu/.env
 command rm -rf -v /home/ubuntu/eportal/*
+command rm -rf -v /home/ubuntu/eportal/.*
 command mv /home/ubuntu/env /home/ubuntu/env
 command mv /home/ubuntu/.env /home/ubuntu/.env
 command echo "done"
