@@ -62,7 +62,7 @@ hooks:
     AfterInstall:
         - location: scripts/before_update.sh
           timeout: 6000
-          runas: ubuntu
+          runas: root
         - location: scripts/after_update_usr.sh
           timeout: 6000
           runas: ubuntu
