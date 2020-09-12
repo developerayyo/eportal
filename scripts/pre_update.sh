@@ -10,8 +10,10 @@
 
 command mv /home/ubuntu/eportal/env /home/ubuntu/env
 command mv /home/ubuntu/eportal/.env /home/ubuntu/.env
+command mv /home/ubuntu/eportal/.git /home/ubuntu/.git
 command rm -rf -v /home/ubuntu/eportal/*
 command rm -rf -v /home/ubuntu/eportal/.*
 command mv /home/ubuntu/env /home/ubuntu/env
 command mv /home/ubuntu/.env /home/ubuntu/.env
+command mv /home/ubuntu/.env /home/ubuntu/.git
 command echo "done"
