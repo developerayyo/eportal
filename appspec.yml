@@ -38,20 +38,20 @@ files:
 #   "permissions" section altogether. A blank or incomplete "permissions"
 #   section may cause associated deployments to fail.
 permissions:
-  - object: /home/ubuntu/eportal
+  - object: /home/ubuntu
     pattern: "**"
     except: ubuntu
     owner:  ubuntu
-    # group:
-    # mode: 
-    # acls:
-    #   -
-    # context:
-    #   user:
-    #   type:
-    #   range:
-    # type:
-    #   -
+    group:
+    mode: 
+    acls:
+      -
+    context:
+      user:
+      type:
+      range:
+    type:
+      -
 # If you are not running any commands on the Amazon EC2 instance, then remove 
 #   the "hooks" section altogether. A blank or incomplete "hooks" section
 #   may cause associated deployments to fail.
