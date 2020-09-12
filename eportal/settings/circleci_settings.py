@@ -1,4 +1,18 @@
 from . base import *
+
+import sentry_sdk
+from sentry_sdk.integrations.django import DjangoIntegration
+
+sentry_sdk.init(
+    dsn=config('dsn'),
+    integrations=[DjangoIntegration()],
+    traces_sample_rate=1.0,
+
+    # If you wish to associate users to errors (assuming you are using
+    # django.contrib.auth) you may enable sending PII data.
+    send_default_pii=True
+)
+
 # Use the following live settings to build on Travis CI
 SECRET_KEY = config("SECRET_KEY")
 DEBUG = False
