@@ -1,6 +1,10 @@
 version: 2.1
+
+orbs:
+  python: circleci/python@0.2.1
+
 jobs:
-  build:
+  build-and-test:
     working_directory: ~/eportal
     docker:
       - image: circleci/python:3.8
