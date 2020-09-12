@@ -41,3 +41,4 @@ deploy:
     application: "EportalProject"
     deployment_group: "epgp"
     region: "us-west-2"
+    wait_until_deployed: true
