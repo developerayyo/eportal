@@ -89,16 +89,16 @@ permissions:
 # During the BeforeInstall deployment lifecycle event, run the commands 
 #   in the script specified in "location".
   BeforeInstall:
-    - location: scripts/before_update_usr.sh
+    - location: scripts/before_update.sh
       timeout: 6000
       runas: ubuntu
-    - location: scripts/before_update_root.sh
-      timeout: 6000
-      runas: root
 # During the AfterInstall deployment lifecycle event, run the commands 
 #   in the script specified in "location".
   AfterInstall:
-    - location: scripts/after_update.sh
+    - location: scripts/after_update_usr.sh
+      timeout: 6000
+      runas: ubuntu
+    - location: scripts/after_update_root.sh
       timeout: 6000
       runas: root
     # - location: scripts/install_python_dependencies.sh
