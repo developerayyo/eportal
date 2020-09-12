@@ -55,6 +55,10 @@ permissions:
 #   the "hooks" section altogether. A blank or incomplete "hooks" section
 #   may cause associated deployments to fail.
 hooks:
+    BeforeInstall:
+        -location: scripts/pre_update
+         timeout: 6000
+         runas: sudo
     AfterInstall:
         - location: scripts/before_update
           timeout: 6000
