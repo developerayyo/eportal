@@ -34,3 +34,10 @@ script:
 # Push the results back to codecov
 after_success:
     - bash <(curl -s https://codecov.io/bash)
+
+deploy:
+  - provider: codedeploy
+    revision_type: github
+    application: "EportalProject"
+    deployment_group: "epgp"
+    region: "us-west-2"
