@@ -3,6 +3,7 @@ from django.contrib.auth.models import AbstractUser
 from django.conf import settings
 from django.urls import reverse
 from django.core.validators import RegexValidator
+from import_export import resources
 
 from .validators import ASCIIUsernameValidator
 
@@ -328,6 +329,30 @@ class TakenCourse(models.Model):
             return round(gpa, 1)
         except ZeroDivisionError:
             return 0
+    def calculate_gpa_old_students(self, total_unit_in_semester):
+        student = TakenCourse.objects.filter(
+            student=self.student, course__level=self.course.level, course__semester=self.course.semester)
+        p = 0
+        point = 0
+        for i in student:
+            courseUnit = i.course.courseUnit
+            if i.grade == A:
+                point = 5
+            elif i.grade == B:
+                point = 4
+            elif i.grade == C:
+                point = 3
+            elif i.grade == D:
+                point = 2
+            else:
+                point = 0
+            p += int(courseUnit) * point
+        try:
+            gpa = (p / total_unit_in_semester)
+            return round(gpa, 1)
+        except ZeroDivisionError:
+            return 0
+
 
     def calculate_cgpa(self):
         current_semester = Semester.objects.get(is_current_semester=True)
@@ -360,12 +385,53 @@ class TakenCourse(models.Model):
                     point = 0
                 p += int(courseUnit) * point
             try:
+                print(TCU)
+                print(p)
                 cgpa = (p / TCU)
                 return round(cgpa, 2)
             except ZeroDivisionError:
                 return 0
         return
 
+    def calculate_cgpa_old_students(self):
+        current_semester = TakenCourse.objects.filter(
+            student=self.student, course__level=self.course.level, course__semester=self.course.semester)
+        previousResult = Result.objects.filter(
+            student__id=self.student.id, level__lt=self.course.level)
+        previousCGPA = 0
+        for i in previousResult:
+            if i.cgpa is not None:
+                previousCGPA += i.cgpa
+        cgpa = 0
+        cs = None
+        for i in current_semester:
+            cs = i.course.semester
+        if str(cs) == SECOND:
+            taken_courses = TakenCourse.objects.filter(
+                student=self.student, student__level=self.student.level)
+            p = 0
+            point = 0
+            TCU = 0
+            for i in taken_courses:
+                TCU += int(i.course.courseUnit)
+                courseUnit = i.course.courseUnit
+                if i.grade == A:
+                    point = 5
+                elif i.grade == B:
+                    point = 4
+                elif i.grade == C:
+                    point = 3
+                elif i.grade == D:
+                    point = 2
+                else:
+                    point = 0
+                p += int(courseUnit) * point
+            try:
+                cgpa = (p / TCU)
+                return round(cgpa, 2)
+            except ZeroDivisionError:
+                return 0
+        return
 
 class Result(models.Model):
     """

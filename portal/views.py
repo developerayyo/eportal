@@ -48,7 +48,6 @@ def home(request):
     no_of_1st_class_students = Result.objects.filter(cgpa__gte=4.5).count()
     no_of_carry_over_students = CarryOverStudent.objects.all().count()
     no_of_students_to_repeat = RepeatingStudent.objects.all().count()
-    # session = Session.objects.all()
     form = StudentSessionForm()
     
     context = {
@@ -535,13 +534,8 @@ def StudentAddView(request):
                 level=column[3],
                 department=column[4],
                 faculty=column[5])
-            # lauch celery task
             default_password_mail.delay(column[2], raw_password)
             default_password_sms(column[2], raw_password)
-            # response = HttpResponse(csv_file_w, content_type='text/csv')
-            # response['Content-Disposition'] = 'attachment; filename="student_details.csv"'
-            # writer = csv.writer(response)
-            # writer.writerow([column[0], raw_password])
     except IndexError:
         """Other Possible Exceptions: IndexError, Integrity Error"""
         messages.error(request, "Index Error:  Your CSV files is incomplete")
@@ -832,12 +826,7 @@ def course_registration(request):
 
         if registered_courses.count() == all_courses.count():
             all_courses_are_registered = True
-
-        # total_semester_unit = 0
-        # total_sec_semester_unit = 0
         total_registered_unit = 0
-        # for i in courses:
-        #     total_semester_unit += int(i.courseUnit)
         for i in registered_courses:
             total_registered_unit += int(i.courseUnit)
         context = {
@@ -845,8 +834,6 @@ def course_registration(request):
             "no_course_is_registered": no_course_is_registered,
             "current_semester": current_semester,
             "courses": courses,
-            # "total_first_semester_unit": total_semester_unit,
-            # "total_sec_semester_unit": total_sec_semester_unit,
             "registered_courses": registered_courses,
             "total_registered_unit": total_registered_unit,
             "student": student,
@@ -875,7 +862,7 @@ def course_drop(request):
     if request.method == 'POST':
         ids = ()
         data = request.POST.copy()
-        data.pop('csrfmiddlewaretoken', None)  # remove csrf_token
+        data.pop('csrfmiddlewaretoken', None)
         for key in data.keys():
             ids = ids + (str(key),)
         for s in range(0, len(ids)):
@@ -983,7 +970,6 @@ def result_pdf(request):
 
     point = 0
     cp = 0
-    # cps = 0
     t = ()
     for i in courses:
         t += (i.course.pk,)
@@ -1002,8 +988,6 @@ def result_pdf(request):
             "total_registered_unit": total_registered_unit,
             "current_semester": current_semester,
             "current_session": current_session,
-            # "point": point,
-            # "cp": cp
         })
     response = HttpResponse(content_type='application/pdf')
     response[
@@ -1018,115 +1002,173 @@ def result_pdf(request):
 
 
 @login_required
-@lecturer_required
 def add_score(request):
     """
     Shows a page where a lecturer will select a course allocated to him for
     score entry in a specific semester and session.
     """
-    current_session = Session.objects.get(is_current_session=True)
-    current_semester = get_object_or_404(Semester,
-                                         is_current_semester=True,
-                                         session=current_session)
-    semester = Course.objects.filter(
-        allocated_course__lecturer__pk=request.user.id,
-        semester=current_semester)
-    courses = Course.objects.filter(
-        allocated_course__lecturer__pk=request.user.id).filter(
-        semester=current_semester)
-    context = {
-        "courses": courses,
-    }
-    return render(request, 'result/add_score.html', context)
+    if request.user.is_lecturer:
+        current_session = Session.objects.get(is_current_session=True)
+        current_semester = get_object_or_404(Semester,
+                                            is_current_semester=True,
+                                            session=current_session)
+        semester = Course.objects.filter(
+            allocated_course__lecturer__pk=request.user.id,
+            semester=current_semester)
+        courses = Course.objects.filter(
+            allocated_course__lecturer__pk=request.user.id).filter(
+            semester=current_semester)
+        context = {
+            "courses": courses,
+        }
+        return render(request, 'result/add_score.html', context)
+    elif request.user.is_superuser:
+        courses = Course.objects.all()
+        context = {
+            "courses": courses,
+        }
+        return render(request, 'result/add_score.html', context)
+    else:
+        return redirect('home')
+
 
 
 @login_required
-@lecturer_required
 def add_score_for(request, id):
     """
     Shows a page where a lecturer will add score for students that are taking courses allocated to him
     in a specific semester and session.
     """
     current_semester = Semester.objects.get(is_current_semester=True)
-    if request.method == 'GET':
-        courses = Course.objects.filter(
-            allocated_course__lecturer__pk=request.user.id).filter(
-            semester=current_semester)
-        course = Course.objects.get(pk=id)
-        students = TakenCourse.objects.filter(
-            course__allocated_course__lecturer__pk=request.user.id).filter(
-            course__id=id).filter(course__semester=current_semester)
-        context = {
-            "courses": courses,
-            "course": course,
-            "students": students,
-        }
-        return render(request, 'result/add_score_for.html', context)
-    if request.method == "POST":
-        ids = ()
-        cas = ()
-        exams = ()
-        csv_file = request.FILES['file']
-        data_set = csv_file.read().decode('UTF-8')
-        io_string = io.StringIO(data_set)
-        for skip in range(11):
-            next(io_string)
-        for column in csv.reader(io_string, delimiter=',', quotechar="|"):
-            ids = ids + (column[2],)
-            cas = cas + (column[9],)
-            exams = exams + (column[16],)
-        for s in range(0, len(ids)):
-            try:
-                student = TakenCourse.objects.get(
-                    student__id_number=ids[s], course__id=id)
-            except:
-                continue
-            courses = TakenCourse.objects.filter(
-                student__id_number=ids[s], course__semester=current_semester)
-            total_unit_in_semester = 0
-            for i in courses:
-                if i == courses.count():
-                    break
-                else:
-                    total_unit_in_semester += int(i.course.courseUnit)
-            student.ca = cas[s]
-            student.exam = exams[s]
-            student.total = student.get_total(ca=student.ca, exam=student.exam)
-            if student.student.department == 'NURSING' and not student.course.courseCode.startswith('GES'):
-                student.grade = student.get_nursing_grade(
-                    ca=student.ca, exam=student.exam)
+    if request.user.is_lecturer:
+        if request.method == 'GET':
+            courses = Course.objects.filter(
+                allocated_course__lecturer__pk=request.user.id).filter(
+                semester=current_semester)
+            course = Course.objects.get(pk=id)
+            students = TakenCourse.objects.filter(
+                course__allocated_course__lecturer__pk=request.user.id).filter(
+                course__id=id).filter(course__semester=current_semester)
+            context = {
+                "courses": courses,
+                "course": course,
+                "students": students,
+            }
+            return render(request, 'result/add_score_for.html', context)
+    elif request.user.is_superuser:
+        if request.method == 'GET':
+            courses = Course.objects.all()
+            course = Course.objects.get(pk=id)
+            context = {
+                "courses": courses,
+                "course": course,
+            }
+            return render(request, 'result/add_score_for.html', context)
+    else:
+        return redirect('home')
+
+    if not request.user.is_student:
+        if request.method == "POST":
+            ids = ()
+            cas = ()
+            exams = ()
+            sessh = None
+            csv_file = request.FILES['file']
+            data_set = csv_file.read().decode('UTF-8')
+            io_string = io.StringIO(data_set)
+            if request.user.is_lecturer:
+                for skip in range(11):
+                    next(io_string)
+                for column in csv.reader(io_string, delimiter=',', quotechar="|"):
+                    ids = ids + (column[2],)
+                    cas = cas + (column[9],)
+                    exams = exams + (column[16],)
             else:
-                student.grade = student.get_grade(
-                    ca=student.ca, exam=student.exam)
-            student.comment = student.get_comment(student.grade)
-            student.carry_over(student.grade)
-            student.is_repeating()
-            student.save()
-            gpa = student.calculate_gpa(total_unit_in_semester)
-            cgpa = student.calculate_cgpa()
-
-            try:
-                a = Result.objects.get(student=student.student,
-                                       semester=current_semester,
-                                       level=student.student.level)
-                a.gpa = gpa
-                a.cgpa = cgpa
-                a.save()
-            except:
-                Result.objects.get_or_create(student=student.student,
-                                             semester=current_semester,
-                                             level=student.student.level,
-                                             gpa=gpa,
-                                             cgpa=cgpa,
-                                             session=current_semester.session)
-        messages.success(request, 'Successfully Uploaded and Recorded')
-    #     return HttpResponseRedirect(
-    #         reverse_lazy('add_score_for', kwargs={'id': id}))
-    # return HttpResponseRedirect(
-    #     reverse_lazy('add_score_for', kwargs={'id': id})
-    # )
-    return redirect('add_score')
-
+                for column in csv.reader(io_string, delimiter=',', quotechar="|"):
+                    sessh = column[0]
+                    print(sessh)
+                    break
+                for skip in range(11):
+                    next(io_string)
+                for column in csv.reader(io_string, delimiter=',', quotechar="|"):
+                    ids = ids + (column[2],)
+                    cas = cas + (column[9],)
+                    exams = exams + (column[16],)
+            for s in range(0, len(ids)):
+                try:
+                    stu = Student.objects.get(id_number=ids[s])
+                    cou = Course.objects.get(pk=id)
+                    if request.user.is_lecturer:
+                        student = TakenCourse.objects.get(
+                            student__id_number=ids[s], course__id=id)
+                    else:
+                        student, _ = TakenCourse.objects.get_or_create(
+                            student=stu, course=cou)
+                except:
+                    continue
+                if request.user.is_lecturer:
+                    courses = TakenCourse.objects.filter(
+                        student__id_number=ids[s], course__semester=current_semester)
+                else:
+                    courses = TakenCourse.objects.filter(
+                        student__id_number=ids[s], course__semester=student.course.semester)
+    
+                total_unit_in_semester = 0
+                for i in courses:
+                    if i == courses.count():
+                        break
+                    else:
+                        total_unit_in_semester += int(i.course.courseUnit)
+                student.ca = cas[s]
+                student.exam = exams[s]
+                student.total = student.get_total(ca=student.ca, exam=student.exam)
+                if student.student.department == 'NURSING' and not student.course.courseCode.startswith('GES'):
+                    student.grade = student.get_nursing_grade(
+                        ca=student.ca, exam=student.exam)
+                else:
+                    student.grade = student.get_grade(
+                        ca=student.ca, exam=student.exam)
+                student.comment = student.get_comment(student.grade)
+                student.carry_over(student.grade)
+                student.is_repeating()
+                student.save()
+                if request.user.is_lecturer:
+                    gpa = student.calculate_gpa(total_unit_in_semester)
+                    cgpa = student.calculate_cgpa()
+                else:
+                    gpa = student.calculate_gpa_old_students(total_unit_in_semester)
+                    cgpa = student.calculate_cgpa_old_students()
+    
+                try:
+                    if request.user.is_lecturer:
+                        a = Result.objects.get(student=student.student,
+                                           semester=current_semester,
+                                           level=student.student.level)
+                    else:
+                        a = Result.objects.get(student=student.student,
+                                           semester=student.course.semester,
+                                           level=student.course.level)
+                    a.gpa = gpa
+                    a.cgpa = cgpa
+                    a.save()
+                except:
+                    if request.user.is_lecturer:
+                        Result.objects.create(student=student.student,
+                                                     semester=current_semester,
+                                                     level=student.student.level,
+                                                     gpa=gpa,
+                                                     cgpa=cgpa,
+                                                     session=current_semester.session)
+                    else:
+                        Result.objects.create(student=student.student,
+                             semester=student.course.semester,
+                             level=student.course.level,
+                             gpa=gpa,
+                             cgpa=cgpa,
+                             session=sessh)
+                messages.success(request, 'Successfully Uploaded and Recorded')
+            return redirect('add_score')
+    
 
 @login_required
 @lecturer_required

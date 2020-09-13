@@ -18,3 +18,4 @@ staticfiles/
 .cc_token
 .coverage
 /htmlcov
+runserver.sh

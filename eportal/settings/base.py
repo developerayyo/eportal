@@ -134,3 +134,5 @@ REST_FRAMEWORK = {
         'rest_framework.permissions.DjangoModelPermissionsOrAnonReadOnly'
     ]
 }
+
+IMPORT_EXPORT_USE_TRANSACTIONS = True
