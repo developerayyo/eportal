@@ -13,6 +13,7 @@ sentry_sdk.init(
     send_default_pii=True
 )
 
+
 DEBUG = False
 ADMINS = [('Peter B', 'server-admin@eportalproject.ml'),]
 
