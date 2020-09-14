@@ -4,6 +4,7 @@ from django.contrib.auth import views
 from django.contrib.staticfiles.urls import static
 from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 from .settings import base
+from django.conf import settings
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -15,5 +16,5 @@ urlpatterns = [
     path('accounts/logout/', views.LogoutView.as_view(), name='logout', kwargs={'next_page': '/'}),
 ]
 urlpatterns += staticfiles_urlpatterns()
-urlpatterns += static(base.MEDIA_URL, document_root=base.MEDIA_ROOT)
-urlpatterns += static(base.STATIC_URL, document_root=base.STATIC_ROOT)
+urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
