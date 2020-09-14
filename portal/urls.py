@@ -78,4 +78,5 @@ urlpatterns = [
     path('scoresheet/download/<int:id>/', views.scoresheet_download, name='scoresheet_download'),
     path('results/', views.result, name='result'),
     path('toggles/', views.toggles),
+    path('mastersheet/', views.mastersheet, name='mastersheet')
 ]

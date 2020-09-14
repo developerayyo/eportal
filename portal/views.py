@@ -1234,3 +1234,8 @@ def toggles(request):
     w.toggle = request.POST['toggle'] == 'true'
     w.save()
     return HttpResponse('success')
+
+@login_required
+@admin_required
+def mastersheet(request):
+    pass
