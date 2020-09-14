@@ -14,7 +14,7 @@ eportal/__pycache__/
 docs/_build/
 docs/_static/
 docs/_templates/
-static/
+/static
 .cc_token
 .coverage
 /htmlcov
