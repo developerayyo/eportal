@@ -14,4 +14,4 @@ command cd /home/ubuntu/eportal
 command export DJANGO_SETTIINGS_MODULE=eportal.settings.pro
 command python3 manage.py makemigrations
 command python3 manage.py migrate
-command python3 manage.py collecstatic
+command python3 manage.py collectstatic
