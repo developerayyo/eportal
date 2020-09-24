@@ -23,9 +23,6 @@ overflow-y: auto;
       <a href="{% url 'add_new_course' %}" class="btn btn-default btn-rounded mb-4">
         Upload Courses
       </a>
-      {% comment %} <a class="pull-right btn btn-default btn-rounded mb-3" href="{{ course_registration_form }}" class="btn btn-default btn-rounded mb-4">
-        <i class="fa fa-file-pdf-o" aria-hidden="true"></i> PDF
-      </a> {% endcomment %}
     </h6>
 <div class="table-wrapper-scroll-y">
 
@@ -57,7 +54,7 @@ overflow-y: auto;
             {% if request.user.is_superuser %}
             <td>
               <a data-toggle="tooltip" title="view" class="blue-text"><i class="fa fa-user"></i></a>
-              <a data-toggle="tooltip" href="{% url 'course_edit' pk=course.id%}" title="edit" class="teal-text"><i class="fa fa-pencil"></i></a>
+              <a data-toggle="tooltip" href="{% url 'course_edit' pk=course.id%}" title="edit" class="teal-text"><i class="fa fa-edit"></i></a>
               <a data-toggle="tooltip" href="{% url 'delete_course' pk=course.id %}" title="delete" class="red-text"><i class="fa fa-times"></i></a>
             </td>
             {% endif %}

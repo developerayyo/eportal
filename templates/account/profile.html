@@ -93,7 +93,6 @@ overflow-y: auto;
       <td>{{ course }}</td>
       <td>{{ course.courseUnit }}</td>
       <td>
-	  	  {% comment %} <span class="table-remove"><a href="{% url 'add_score_for' course.id %}" class="btn btn-info btn-rounded btn-sm my-0">Download</a></span> {% endcomment %}
 	  	  <span class="table-remove"><a href="{% url 'scoresheet_download' course.id %}" class="btn btn-info btn-rounded btn-sm my-0">Download</a></span>
 	    </td>
     </tr>

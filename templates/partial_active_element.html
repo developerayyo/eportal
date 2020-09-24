@@ -1,7 +1,7 @@
 <div class="list-group list-group-flush">
     <a href="/" class="list-group-item 
         {% if active == 'Dashboard' %} active {% endif %} waves-effect">
-        <i class="fa fa-pie-chart mr-3" aria-hidden="true"></i>Dashboard</a>
+        <i class="fa fa-puzzle-piece mr-3" aria-hidden="true"></i>Dashboard</a>
     
     <a href="{% url 'profile' %}" class="list-group-item 
         {% if active == 'Profile' %} active {% endif %} waves-effect">
@@ -89,16 +89,16 @@
     {% if request.user.is_superuser %}
     <a href="{% url 'manage_semester' %}" class="list-group-item 
         {% if active == 'manage_semester' %} active {% endif %} waves-effect">
-        <i class="fa  fa-gear mr-3" aria-hidden="true"></i>Semester Setting</a>
+        <i class="fa  fa-cogs mr-3" aria-hidden="true"></i>Semester Setting</a>
     {% endif %}
     
     <a href="#" class="list-group-item 
         {% if active == 'payment' %} active {% endif %} waves-effect">
-        <i class="fa  fa-cc-mastercard mr-3" aria-hidden="true"></i>Wiki How</a>
+        <i class="fa  fa-book mr-3" aria-hidden="true"></i>Wiki How</a>
 
     {% if request.user.is_superuser %}
     <a href="#" class="list-group-item 
         {% if active == 'system_setting' %} active {% endif %} waves-effect">
-        <i class="fa  fa-gear mr-3" aria-hidden="true"></i>System setting</a>
+        <i class="fa  fa-cogs mr-3" aria-hidden="true"></i>System setting</a>
     {% endif %}
 </div>

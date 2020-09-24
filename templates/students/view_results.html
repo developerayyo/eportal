@@ -26,13 +26,6 @@ overflow-y: auto;
 </style>
 {% if w.toggle %}
 <div class="table-wrapper-scroll-y">
-  {% comment %} {% if   %}
-    <div>
-      <a target="_blank" href="{% url 'course_registration_pdf' %}" class="view view-cascade gradient-card-header blue-gradient narrower py-2 mx-4 mb-3 d-flex justify-content-center align-items-center btn btn-outline-white btn-rounded btn-sm px-2">
-        <i class="fa fa-file-pdf-o" aria-hidden="true"></i> Print Result
-      </a>
-    </div>
-  {% endif %} {% endcomment %}
   
   <table class="table table-bordered table-striped">
     <thead>
@@ -56,7 +49,6 @@ overflow-y: auto;
       </a>
     </div>
     {% for course in courses %}
-    {% comment %} {% if course.course.semester == "First" %} {% endcomment %}
     <tbody>
       <tr>
         <th scope="row">{{ forloop.counter }}</th>
@@ -69,7 +61,6 @@ overflow-y: auto;
         <td>{{ course.grade }}</td>
       </tr>
     </tbody>
-    {% comment %} {% endif %} {% endcomment %}
     {% endfor %}
     <br>
   </table>
@@ -101,9 +92,6 @@ overflow-y: auto;
     {% else %}
        <th><label>CGPA:</label> Not ready yet!</th>
     {% endif %}<br>
-
-    {% comment %} <th><label>Previous CGPA:</label> {{ previousCGPA }}</th> {% endcomment %}
-
   </tr>
 </tbody>
 {% endif %}

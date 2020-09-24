@@ -8,14 +8,6 @@
     {% include 'partial_active_element.html' with active='course_registration' %}
 {% endblock side_bar %}
 {% block content %}
-    {% block js %}
-        <script
-                src="https://code.jquery.com/jquery-3.3.1.min.js"
-                integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="
-                crossorigin="anonymous"></script>
-        <script type="text/javascript" src="{% static 'js/tbl_scroll.js' %}"></script>
-        <script type="text/javascript" src="{% static 'js/disable_checkbox.js' %}"></script>
-    {% endblock js %}
     <div class="container-fluid mt-5">
         <!-- Table with panel -->
         {% if not all_courses_are_registered %}
@@ -228,3 +220,13 @@
     <br>
     <br>
 {% endblock %}
+{% block doemready %}
+    $('#dtVerticalScrollExample').DataTable({
+        "scrollY": "200px",
+        "scrollCollapse": true,
+        });
+    $('.dataTables_length').addClass('bs-select');
+    
+    // Tooltips Initialization
+    $('[data-toggle="tooltip"]').tooltip()
+{% endblock doemready %}

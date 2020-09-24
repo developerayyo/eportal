@@ -42,7 +42,7 @@
                           <td>{% if semester.is_current_semester %}<i class="fa fa-check"></i>{% else %}<i class="fa fa-times">{% endif %}</td>
                           <td>
                             <a title="view" class="blue-text"><i class="fa fa-user"></i></a>
-                            <a href="{% url 'edit_semester' pk=semester.pk %}" title="edit" class="teal-text"><i class="fa fa-pencil"></i></a>
+                            <a href="{% url 'edit_semester' pk=semester.pk %}" title="edit" class="teal-text"><i class="fa fa-edit"></i></a>
                             <a href="{% url 'delete_semester' pk=semester.pk %}" title="delete" class="red-text"><i class="fa fa-times"></i></a>
                           </td>
                         </tr>

@@ -40,7 +40,7 @@
                           <td>{% if session.is_current_session %}<i class="fa fa-check"></i>{% else %}<i class="fa fa-times">{% endif %}</td>
                           <td>
                             <a title="view" class="blue-text"><i class="fa fa-user"></i></a>
-                            <a href="{% url 'edit_session' pk=session.pk %}" title="edit" class="teal-text"><i class="fa fa-pencil"></i></a>
+                            <a href="{% url 'edit_session' pk=session.pk %}" title="edit" class="teal-text"><i class="fa fa-edit"></i></a>
                             <a href="{% url 'delete_session' pk=session.pk %}" title="delete" class="red-text"><i class="fa fa-times"></i></a>
                           </td>
                         </tr>
