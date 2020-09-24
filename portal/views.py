@@ -1310,7 +1310,7 @@ def mastersheet(request):
             response = HttpResponse(content_type='application/pdf')
             response['Content-Disposition'] = f'attachment; filename="{dept}_{level}Level_mastersheet.pdf"'
             weasyprint.HTML(string=html, base_url=request.build_absolute_uri()).write_pdf(response,
-                stylesheets=[weasyprint.CSS(settings.STATIC_ROOT + '/css/pdf.css')]
+                stylesheets=[weasyprint.CSS(settings.STATIC_ROOT + '/css/mastersheetpdf.css')]
                 )
             return response
     else:
