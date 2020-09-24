@@ -16,12 +16,12 @@ LEVEL = (
 )
 
 FACULTY = (
-    ("FOS", "FOS"),
-    ("FOE", "FOE"),
-    ("FBMS", "FBMS"),
-    ("FBSS", "FBSS"),
-    ("FOA", "FOA"),
-    ("FOL", "FOL"),
+    ("FACULTY OF SCIENCE", "FACULTY OF SCIENCE"),
+    ("FACULTY OF ENGINEERING", "FACULTY OF ENGINEERING"),
+    ("FACULTY OF BASIC MEDICAL SCIENCES", "FACULTY OF BASIC MEDICAL SCIENCES"),
+    ("FACULTY OF BUSINESS AND SOCIAL SCIENCES", "FACULTY OF BUSINESS AND SOCIAL SCIENCES"),
+    ("FACULTY OF ART", "FACULTY OF ART"),
+    ("FACULTY OF LAW", "FACULTY OF LAW"),
 )
 
 DEPARTMENT = (
@@ -150,7 +150,7 @@ class Student(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     id_number = models.CharField(max_length=20, unique=True)
     level = models.CharField(choices=LEVEL, max_length=3)
-    faculty = models.CharField(choices=FACULTY, max_length=4)
+    faculty = models.CharField(choices=FACULTY, max_length=100)
     department = models.CharField(choices=DEPARTMENT, max_length=40)
 
     def __str__(self):
@@ -435,7 +435,7 @@ class TakenCourse(models.Model):
 
 class Result(models.Model):
     """
-    Result Dtabase Table that keeps record of the,
+    Result Database Table that keeps record of the,
     Final result of students who have taken courses and
     and have CAs and exam scores in their records.
     """

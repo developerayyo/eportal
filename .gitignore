@@ -19,3 +19,4 @@ static/
 .coverage
 /htmlcov
 runserver.sh
+settings.ini

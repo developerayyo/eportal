@@ -1,0 +1,46 @@
+{% extends 'base.html' %}
+
+{% block title %}ACRRPS | Mastersheet{% endblock title %}
+
+{% block side_bar %}
+    {% include 'partial_active_element.html' with active='result' %}
+{% endblock side_bar %}
+
+{% block content %}
+	<div class="container-fluid mt-5">
+          {% if messages %}
+        {% for message in messages %}
+          <div class="alert alert-success alert-dismissable">
+            <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+            {{ message }}
+          </div>
+        {% endfor %}
+      {% endif %}
+      Select a department and level below
+      <form class="mt-5" method="post">{% csrf_token %}
+        <div class="form-row">
+          <div class="col-md-4">
+            <!-- Material input -->
+            <div>
+              <label for="inputCityMD">{{ form.department.label }}</label>
+            </div>
+            <div class="md-form form-group">
+            {{ form.department }}
+            </div>
+          </div>
+          <div class="col-md-1"></div>
+
+          <div class="col-md-4">
+            <!-- Material input -->
+            <div>
+              <label for="inputCityMD">{{ form.level.label }}</label>
+            </div>
+            <div class="md-form form-group">
+            {{ form.level }}
+            </div>
+          </div>
+        </div>
+        <button type="submit" class="btn btn-primary btn-md">Download Mastersheet</button>
+      </form>
+</div>
+{% endblock %}

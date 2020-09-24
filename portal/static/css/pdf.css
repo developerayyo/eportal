@@ -11,11 +11,11 @@
     font-size: larger;
 }
 #brand, #logo{
-    margin-right: 1%;
+    /* margin-right: 1%; */
 }
 #brand{
     /* border: 1px solid red; */
-    width: 55%;
+    /* width: 55%; */
     /* display: ; */
 }
 .logo{
@@ -26,11 +26,11 @@
     margin-bottom: 20px;
 }
 #contain{
-    display: flex;
+    /* display: flex; */
 }
 #logo{
 }
-#image{
+#img{
 }
 table{
     width: 100%;

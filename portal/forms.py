@@ -338,3 +338,10 @@ class SemesterForm(forms.ModelForm):
             'semester', 'is_current_semester', 'session',
             'next_semester_begins'
         ]
+
+
+class DepartmentLevelForm(forms.ModelForm):
+    
+    class Meta:
+        model = Student
+        fields = ("department", "level",)

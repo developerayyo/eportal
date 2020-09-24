@@ -21,12 +21,13 @@ overflow-y: auto;
   <h6 class="mb-2 mb-sm-0 pt-1">
     <label>Release Result?</label>
     <label class="switch">
-        <input type="checkbox" id="checkbox" value="{{result_render.toggle}}>
+        <input type="checkbox" id="checkbox" value="{{result_render.toggle}}">
         <span class="slider round"></span>
     </label>
   </h6>
+  <a href="{% url 'add_score' %}"><button type="button" class="btn btn-default w-25 p-3 float-left">Upload Old Students Result</button></a>
+  <a href="{% url 'mastersheet' %}"><button type="button" class="btn btn-default w-25 p-3 float-left">Download Mastersheet</button></a>
 </div>
-<a href="{% url 'add_score' %}"><button type="button" class="btn btn-default w-25 p-3 float-left">Upload Old Students Result</button></a>
 {% endblock %}
 
 {% block domready %}

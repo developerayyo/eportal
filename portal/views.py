@@ -21,7 +21,8 @@ from .tasks import default_password_mail, default_password_staff
 from .decorators import lecturer_required, admin_required, student_required
 from .forms import (
     ProfileForm, StaffAddForm, StudentAddForm, SessionForm,
-    SemesterForm, CourseAddForm, CourseAllocationForm, StudentSessionForm)
+    SemesterForm, CourseAddForm, CourseAllocationForm, StudentSessionForm,
+    DepartmentLevelForm)
 from .models import (
     User, Student, CarryOverStudent, RepeatingStudent, Course,
     TakenCourse, Result, Semester, CourseAllocation, Session,
@@ -544,7 +545,7 @@ def StudentAddView(request):
 
 def default_password_sms(id_number, pwd):
     """
-    Task to send auto-generated passwords to student's e-mail
+    Task to send registration details to student's mobile number
     """
     student = Student.objects.get(id_number=id_number)
     message = client.messages \
@@ -938,7 +939,7 @@ def course_registration_pdf(request):
         })
     response = HttpResponse(content_type='application/pdf')
     response[
-        'Content-Disposition'] = f'filname=student_{student.id_number}.pdf'
+        'Content-Disposition'] = f'attachment; filename="{student.user.get_full_name()}_{current_semester}-Semester-{current_session}_courseReg.pdf"'
     weasyprint.HTML(string=html, base_url=request.build_absolute_uri()).write_pdf(
         response,
         stylesheets=[weasyprint.CSS(settings.STATIC_ROOT + '/css/pdf.css')])
@@ -991,7 +992,7 @@ def result_pdf(request):
         })
     response = HttpResponse(content_type='application/pdf')
     response[
-        'Content-Disposition'] = f'filname=student_{student.id_number}.pdf'
+        'Content-Disposition'] = f'attachment; filename="{student.user.get_full_name()}_{current_semester}-Semester-{current_session}_result.pdf"'
     weasyprint.HTML(string=html, base_url=request.build_absolute_uri()).write_pdf(
         response,
         stylesheets=[weasyprint.CSS(settings.STATIC_ROOT + '/css/resultpdf.css')])
@@ -1076,13 +1077,19 @@ def add_score_for(request, id):
             csv_file = request.FILES['file']
             data_set = csv_file.read().decode('UTF-8')
             io_string = io.StringIO(data_set)
-            if request.user.is_lecturer:
+            if request.user.is_lecturer: 
                 for skip in range(11):
                     next(io_string)
                 for column in csv.reader(io_string, delimiter=',', quotechar="|"):
-                    ids = ids + (column[2],)
-                    cas = cas + (column[9],)
-                    exams = exams + (column[16],)
+                    try:
+                        print(column[2])
+                        ids = ids + (column[2],)
+                        print(column[9])
+                        cas = cas + (column[9],)
+                        print(column[16])
+                        exams = exams + (column[16],)
+                    except:
+                        continue
             else:
                 for column in csv.reader(io_string, delimiter=',', quotechar="|"):
                     sessh = column[0]
@@ -1174,18 +1181,14 @@ def add_score_for(request, id):
 @lecturer_required
 def scoresheet_download(request, id):
     """A function that handles scoresheet template download for lecturers"""
-    response = HttpResponse(content_type='text/csv')
-    response['Content-Disposition'] = 'attachment; filename="scoresheet.csv"'
-    writer = csv.writer(response)
-
     current_semester = Semester.objects.get(is_current_semester=True)
     course = TakenCourse.objects.filter(course__id=id)
-
+    cour = Course.objects.get(id=id)
     header = [['ADELEKE UNIVERSITY, EDE'],
               [f'{current_semester.session} ACADEMIC SESSION'],
               [f'{current_semester} Semester'],
-              [f'{i.course.courseTitle} ({i.course.courseCode} - {i.course.courseUnit}Unit)' for i in course],
-              [f'{i.course.level} Level' for i in course]
+              [f'{cour.courseTitle} ({cour.courseCode} - {cour.courseUnit}Unit)'],
+              [f'{cour.level} Level']
               ]
 
     content = [['', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', ''],
@@ -1216,6 +1219,10 @@ def scoresheet_download(request, id):
         content.append([sn, i.student.user.get_full_name(
         ), i.student.id_number, '', '', '', '', '', '', '', '', '', '', '', '', '', ''])
         sn += 1
+
+    response = HttpResponse(content_type='text/csv')
+    response['Content-Disposition'] = f'attachment; filename="{alc.lecturer.get_full_name()}_{cour.courseCode}_scoresheet.csv"'
+    writer = csv.writer(response)
     writer.writerows(header)
     writer.writerows(content)
     writer.writerows(footer)
@@ -1238,4 +1245,74 @@ def toggles(request):
 @login_required
 @admin_required
 def mastersheet(request):
-    pass
+    """
+    
+    """
+    cs = Semester.objects.get(is_current_semester=True)
+    current_session = Session.objects.get(is_current_session=True)
+    if request.method == "POST":
+        form = DepartmentLevelForm(request.POST)
+        dept = None
+        level = None
+        faculty = None
+        TCU = 0
+        if form.is_valid():
+            dept = str(form.data.get('department'))
+            level = int(form.data.get('level'))
+            tkc = TakenCourse.objects.filter(course__semester=cs, student__department=dept, student__level=level)
+            students = set()
+            courses = set()
+            for c in tkc:
+               courses.add(c.course.courseCode)
+            courses = list(courses)
+            coursesObj = Course.objects.filter(courseCode__in=courses)
+            for i in coursesObj:
+                TCU += int(i.courseUnit)
+            for i in tkc:
+                students.add(i.student.id_number)
+            students = list(students)
+            studentsObj = Student.objects.filter(id_number__in=students)
+            for i in studentsObj:
+                faculty=i.faculty
+                break
+            res = Result.objects.filter(semester=cs, session=current_session, student__id_number__in=students, level=level, student__department=dept)
+            oc = CarryOverStudent.objects.filter(student__id_number__in=students, course__courseCode__in=courses)
+            tkcs = None
+            total = None
+            scores = {}
+            for i in range(0, len(students)):
+                for j in range(0, len(courses)):
+                    tkcs = TakenCourse.objects.filter(student__id_number=students[i], course__courseCode=courses[j])
+            for i in studentsObj:
+                d = {i.id_number: []}
+                scores.update(d)
+            for i in scores:
+                for c in coursesObj:
+                    cc = TakenCourse.objects.get(student__id_number=i, course__courseCode=c.courseCode)
+                    scores[i].append(cc.total)
+            print(scores)
+            html = render_to_string(
+                        'result/mastersheetprint.html', {
+                        "cs": cs,
+                        "oc": oc,
+                        'res': res,
+                        "TCU": TCU,
+                        "current_session": current_session,
+                        "faculty": faculty,
+                        "dept": dept,
+                        "level": level,
+                        "tkc": tkc,
+                        "tkcs": tkcs,
+                        "studentsObj": studentsObj,
+                        "coursesObj": coursesObj,
+                        "scores": scores,
+                    })
+            response = HttpResponse(content_type='application/pdf')
+            response['Content-Disposition'] = f'attachment; filename="{dept}_{level}Level_mastersheet.pdf"'
+            weasyprint.HTML(string=html, base_url=request.build_absolute_uri()).write_pdf(response,
+                stylesheets=[weasyprint.CSS(settings.STATIC_ROOT + '/css/pdf.css')]
+                )
+            return response
+    else:
+        form = DepartmentLevelForm()
+    return render(request, "result/mastersheet.html", {'form': form})

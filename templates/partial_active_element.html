@@ -43,6 +43,12 @@
         <i class="fa fa-book mr-3" aria-hidden="true"></i>Result</a>
     {% endif %}
 
+    {% if request.user.is_superuser %}
+    <a href="{% url 'mastersheet' %}" class="list-group-item 
+        {% if active == 'Mastersheet' %} active {% endif %} waves-effect">
+        <i class="fa fa-book mr-3" aria-hidden="true"></i>Mastersheet</a>
+    {% endif %}
+
     {% if request.user.is_student %}
     <a href="{% url 'course_registration' %}" class="list-group-item 
         {% if active == 'course_registration' %} active {% endif %} waves-effect">
