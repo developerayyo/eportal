@@ -11,8 +11,8 @@
 command source /home/ubuntu/eportal/env/bin/activate
 command pip3 install -r /home/ubuntu/eportal/requirements.txt
 command cd /home/ubuntu/eportal
-command chmod +x manage.py
+command chmod +x manage.py --settings=eportal.settings.pro
 command ./manage.py makemigrations --settings=eportal.settings.pro
 command ./manage.py migrate --settings=eportal.settings.pro
-command ./manage.py loaddata dbback3.json --settings=eportal.settings.pro
+# command ./manage.py loaddata dbback3.json --settings=eportal.settings.pro
 command ./manage.py collectstatic --settings=eportal.settings.pro
