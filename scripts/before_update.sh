@@ -8,7 +8,7 @@
 # Usage: ./before_update.sh
 #####################################################################
 
-command service supervisorctl stop all
+command supervisorctl stop all
 command service nginx stop
 
 
