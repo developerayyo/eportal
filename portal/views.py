@@ -38,9 +38,9 @@ client = Client(account_sid, auth_token)
 @login_required
 def home(request):
     """
-    Shows our dashboard containing number of students, courses, lecturers,
-    repating students,
-    carry over students and 1st class students in an interactive graph
+    Shows dashboard on the administrator's interface which containing number of 
+    students, courses, lecturers, repating students, carry over students and 1st 
+    class students in an interactive graph.
     """
     students = Student.objects.all().count()
     staff = User.objects.filter(is_lecturer=True).count()
@@ -58,7 +58,7 @@ def home(request):
         "no_of_1st_class_students": no_of_1st_class_students,
         "no_of_students_to_repeat": no_of_students_to_repeat,
         "no_of_carry_over_students": no_of_carry_over_students,
-        current_semester: current_semester,
+        "current_semester": current_semester,
         "form": form,
     }
 
@@ -67,7 +67,9 @@ def home(request):
 
 @login_required
 def profile(request):
-    """ Show profile of any user that fire out the request """
+    """
+    Show profile of any user that fire out the request.
+    """
     current_semester = Semester.objects.get(is_current_semester=True)
     if request.user.is_lecturer:
         courses = Course.objects.filter(
@@ -92,7 +94,9 @@ def profile(request):
 
 @login_required
 def user_profile(request, id):
-    """ Show profile of any selected user """
+    """
+    Show profile of any selected user.
+    """
     if request.user.id == id:
         return redirect("/profile/")
 
@@ -128,7 +132,7 @@ def user_profile(request, id):
 @admin_required
 def profile_update(request):
     """ 
-    Check if the fired request is a POST then grap changes and
+    Check if the fired request is a POST then grab changes and
     update the records otherwise we show an empty form.
     """
     user = request.user.id
@@ -238,7 +242,9 @@ def get_chart(request, *args, **kwargs):
 @login_required
 @admin_required
 def course_list(request):
-    """ Show list of all registered courses in the system """
+    """
+    Show list of all registered courses in the system.
+    """
     courses = Course.objects.all()
     context = {
         "courses": courses,
@@ -249,7 +255,9 @@ def course_list(request):
 @login_required
 @admin_required
 def student_list(request):
-    """ Show list of all registered students in the system """
+    """
+    Show list of all registered students in the system.
+    """
     students = Student.objects.all()
     user_type = "Student"
     context = {
@@ -262,7 +270,9 @@ def student_list(request):
 @login_required
 @admin_required
 def staff_list(request):
-    """ Show list of all registered staff """
+    """
+    Show list of all registered staff.
+    """
     staff = User.objects.filter(is_student=False)
     user_type = "Staff"
     context = {
@@ -275,7 +285,9 @@ def staff_list(request):
 @login_required
 @admin_required
 def session_list_view(request):
-    """ Show list of all sessions """
+    """
+    Show list of all sessions.
+    """
     sessions = Session.objects.all().order_by('-session')
     return render(request, 'result/manage_session.html', {
         "sessions": sessions,
@@ -287,7 +299,7 @@ def session_list_view(request):
 def session_add_view(request):
     """
     check request method, if POST we add session otherwise
-    show empty form
+    show empty form.
     """
     if request.method == 'POST':
         form = SessionForm(request.POST)
@@ -427,7 +439,9 @@ def semester_delete_view(request, pk):
 @login_required
 @admin_required
 def StaffAddView(request):
-    """A function that add lecturer details to the database from a CSV file"""
+    """
+    A view for uploading lecturer to the database from a CSV file.
+    """
     template = "registration/add_staff.html"
     Users = get_user_model()
     prompt = {'order': 'Just upload the csv file for now'}
@@ -493,7 +507,9 @@ def delete_staff(request, pk):
 @login_required
 @admin_required
 def StudentAddView(request):
-    """A function that add users details to the database from a CSV file"""
+    """
+    A viewfor uploading students to the database from a CSV file.
+    """
     template = "registration/add_student.html"
     Users = get_user_model()
     prompt = {'order': 'Just upload the csv file for now'}
@@ -538,14 +554,14 @@ def StudentAddView(request):
             default_password_mail.delay(column[2], raw_password)
             default_password_sms(column[2], raw_password)
     except IndexError:
-        """Other Possible Exceptions: IndexError, Integrity Error"""
+        # TODO : catch other Possible Exceptions: IndexError, Integrity Error
         messages.error(request, "Index Error:  Your CSV files is incomplete")
     context = {}
     return render(request, template, context)
 
 def default_password_sms(id_number, pwd):
     """
-    Task to send registration details to student's mobile number
+    Task to send registration details to student's mobile number.
     """
     student = Student.objects.get(id_number=id_number)
     message = client.messages \
@@ -661,8 +677,6 @@ class CourseAllocationView(CreateView):
 @login_required
 @admin_required
 def course_allocation_upload(request):
-    """[summary]
-    """
     template = 'course/course_allocation_upload.html'
     prompt = {'order': 'upload courses_allocations in csv format'}
     if request.method == "GET":
@@ -915,7 +929,9 @@ def view_result(request):
 @login_required
 @student_required
 def course_registration_pdf(request):
-    """View to handle WeasyPrint PDF for student Course Registration"""
+    """
+    View to handle WeasyPrint PDF for student Course Registration.
+    """
     current_semester = Semester.objects.get(is_current_semester=True)
     current_session = Session.objects.get(is_current_session=True)
     student = Student.objects.get(user__pk=request.user.id)
@@ -949,7 +965,9 @@ def course_registration_pdf(request):
 @login_required
 @student_required
 def result_pdf(request):
-    """View that allows student to print their result"""
+    """
+    View that allows student to print their result.
+    """
     w = ResultRender.objects.get()
     student = Student.objects.get(user__pk=request.user.id)
     current_semester = Semester.objects.get(is_current_semester=True)
@@ -1037,8 +1055,8 @@ def add_score(request):
 @login_required
 def add_score_for(request, id):
     """
-    Shows a page where a lecturer will add score for students that are taking courses allocated to him
-    in a specific semester and session.
+    Shows a page where a lecturer will add score for students that are taking 
+    courses allocated to him in a specific semester and session.
     """
     current_semester = Semester.objects.get(is_current_semester=True)
     if request.user.is_lecturer:
@@ -1180,7 +1198,9 @@ def add_score_for(request, id):
 @login_required
 @lecturer_required
 def scoresheet_download(request, id):
-    """A function that handles scoresheet template download for lecturers"""
+    """
+    A view that handles scoresheet template download for lecturers.
+    """
     current_semester = Semester.objects.get(is_current_semester=True)
     course = TakenCourse.objects.filter(course__id=id)
     cour = Course.objects.get(id=id)
@@ -1245,9 +1265,6 @@ def toggles(request):
 @login_required
 @admin_required
 def mastersheet(request):
-    """
-    
-    """
     cs = Semester.objects.get(is_current_semester=True)
     current_session = Session.objects.get(is_current_session=True)
     if request.method == "POST":

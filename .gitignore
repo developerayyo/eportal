@@ -20,3 +20,15 @@ static/
 /htmlcov
 runserver.sh
 settings.ini
+tests_data/peter.csv
+tests_data/result.csv
+tests_data/staffs.csv
+tests_data/students.csv
+tests_data/students2.csv
+tests_data/students3.csv
+tests_data/courses/courses100.csv
+tests_data/courses/courses200.csv
+tests_data/courses/courses300.csv
+tests_data/courses/courses400.csv
+tests_data/courses/courses500csv
+tests_data/courses/import.csv
