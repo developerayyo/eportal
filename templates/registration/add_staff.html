@@ -1,19 +1,22 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>ACRRPS | Upload Lecturers</title>
-</head>
-<body>
-    {% if messages %}
+{% extends 'base.html' %}
+
+{% block title %}ACRRPS | Upload Staffs{% endblock title %}
+
+{% block side_bar %}
+    {% include 'partial_active_element.html' with active='staff' %}
+{% endblock side_bar %}
+
+{% block content %}
+	<div class="container-fluid mt-5">
+          {% if messages %}
         {% for message in messages %}
-            <div>
-                    <!-- | means OR operator-->
-                <strong>{{message|safe}}</strong>
-            </div>
+          <div class="alert alert-danger alert-dismissable">
+            <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+            {{ message }}
+          </div>
         {% endfor %}
-    {% else %}
-    {{order}}
+      {% endif %}
+      {{ order }}
     <form action="" method="POST" enctype="multipart/form-data">
         {% csrf_token %}
         <label for="file1"> Upload a file</label>
@@ -21,9 +24,6 @@
         <small>Only accepts CSV files</small>
         <button type="submit">Upload</button>
     </form>
-    {% endif %}
-    {% comment %} {% for profile in profiles %}
-    {{profile.name}}
-    {% endfor %} {% endcomment %}
-</body>
-</html>
+</div>
+<br>
+{% endblock %}

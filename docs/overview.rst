@@ -50,12 +50,10 @@ Students
 ^^^^^^^^
 
 * Finished:
-    * Register for courses.
-    * View their registered courses.
-    * View their result.
-    * Restrict Students from Registering courses if they did'nt meet course registration requirements.
-    * Restrict Students from viewing or printing their result while the administrator has not release the result yet.
-    * Change their password.
+    * Course registration.
+    * Viewe registered courses and print course registration form.
+    * View and print result.
+    * Change password.
 * ToDo:
     * Switch from one session or semester to another.
     * Add wiki-how section to their view where they can learn how their view works.
@@ -65,9 +63,8 @@ Lecturers
 
 * Finished:
     * View List of allocated Courses in the `Profile Section`
-    * Upload Scoresheet for each course allocated to them
-    * Use the School Standard Scoresheet Template
-    * Lecturers should be able to download the scoresheet template for each courses allocated to them.
+    * Upload Scoresheet for each course allocated to them.
+    * Download the scoresheet template for each courses allocated to them.
     * Change their password
 * ToDo:
     * Add wiki-how section to their view where they can learn how their view works.
@@ -84,9 +81,11 @@ Administrator
     * Change password.
     * Change current Session/Semester for the whole school.
     * Add a toggle button to Administrator view that allows him to reveal or hide Result.
+    * Upload old students results to the site
+    * Download Result mastersheet for a selected Department and level
 * ToDo:
-    * Add export to PDF, Excel and CSV functionality to various views where they are needed.
-    * Add FilterBy Functionality.
+    * export data from the site to various formats e.g pdf, csv, etc.
+    * filter courses/students/staff/others lists.
 
 Proposed Enhancements
 =====================
@@ -94,4 +93,4 @@ Proposed Enhancements
 
 Contribution
 ============
-    If you would like to contrbute in anyway, either by sharing your ideas , resourses, research notes, similar projects on this Topic with me, or you want to explore or test the site for, don't hessitate to reach me @ `Contact <https://docs.eportalproject.ml/en/latest/getting%20started.html#contact/>`_ or if you use Github, you can raise your contributions as issues on `Github <https://github.com/developerayyo/eportal/issues/>`_ .
+    If you would like to contrbute in anyway, either by sharing your ideas , resourses, research notes, similar projects on this Topic with me, or you want to explore or test the site for, send me mail developer@eportalproject.ml or DM me  `Live-chat <https://tawk.to/2eb8621a65f5ea02010345519f534eec9ced3231>`_ .

@@ -1,5 +1,6 @@
 import csv
 import io
+import datetime
 import weasyprint
 from itertools import islice
 from decouple import config
@@ -9,7 +10,7 @@ from django.contrib.auth import update_session_auth_hash, get_user_model
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import PasswordChangeForm
 from django.contrib.auth.hashers import make_password
-from django.http import JsonResponse, HttpResponseRedirect, HttpResponse
+from django.http import JsonResponse, HttpResponseRedirect, HttpResponse, Http404
 from django.contrib import messages
 from django.utils.decorators import method_decorator
 from django.views.generic import CreateView
@@ -17,7 +18,12 @@ from django.template.loader import render_to_string
 from django.conf import settings
 from django.urls import reverse_lazy
 
-from .tasks import default_password_mail, default_password_staff
+from django.utils.datastructures import MultiValueDictKeyError
+from django.db import IntegrityError
+# from django.core.exceptions import
+
+
+from .tasks import student_reg, staff_reg
 from .decorators import lecturer_required, admin_required, student_required
 from .forms import (
     ProfileForm, StaffAddForm, StudentAddForm, SessionForm,
@@ -34,11 +40,12 @@ account_sid = config('account_sid')
 auth_token = config('auth_token')
 client = Client(account_sid, auth_token)
 
+dt = datetime.datetime.today()
 
 @login_required
 def home(request):
     """
-    Shows dashboard on the administrator's interface which containing number of 
+    Shows dashboard on the administrator's interface which contains number of 
     students, courses, lecturers, repating students, carry over students and 1st 
     class students in an interactive graph.
     """
@@ -128,30 +135,31 @@ def user_profile(request, id):
 
 
 @login_required
-@lecturer_required
-@admin_required
 def profile_update(request):
     """ 
     Check if the fired request is a POST then grab changes and
     update the records otherwise we show an empty form.
     """
-    user = request.user.id
-    user = User.objects.get(pk=user)
-    if request.method == 'POST':
-        form = ProfileForm(request.POST)
-        if form.is_valid():
-            if request.FILES:
-                user.picture = request.FILES['picture']
-            user.save()
-            messages.success(request, 'Your profile was successfully edited.')
-            return redirect("/profile/")
-    else:
-        form = ProfileForm(instance=user,
-                           initial={
-                               'picture': user.picture,
-                           })
+    if not request.user.is_student:
+        user = request.user.id
+        user = User.objects.get(pk=user)
+        if request.method == 'POST':
+            form = ProfileForm(request.POST)
+            if form.is_valid():
+                if request.FILES:
+                    user.picture = request.FILES['picture']
+                user.save()
+                messages.success(request, 'Your profile was successfully edited.')
+                return redirect("/profile/")
+        else:
+            form = ProfileForm(instance=user,
+                            initial={
+                                'picture': user.picture,
+                            })
 
-    return render(request, 'account/profile_update.html', {'form': form})
+        return render(request, 'account/profile_update.html', {'form': form})
+    else:
+        return redirect('home')
 
 
 @login_required
@@ -447,39 +455,54 @@ def StaffAddView(request):
     prompt = {'order': 'Just upload the csv file for now'}
     if request.method == "GET":
         return render(request, template, prompt)
-    csv_file = request.FILES['file']
+    else:
+        try:
+            csv_file = request.FILES['file']
+        except MultiValueDictKeyError:
+            messages.error(request, "Error!!!:  Sorry, you need to upload a file!")
+            return redirect('add_new_staff')
 
-    # is it really a csv file??
-    if not csv_file.name.endswith('.csv'):
-        messages.error(request, "This is not a CSV file")
-    data_set = csv_file.read().decode('UTF-8')
+        if not csv_file.name.endswith('.csv'):
+            messages.error(request,"This is not a CSV file")
+            return redirect('add_new_staff')
+        data_set = csv_file.read().decode('UTF-8')
 
-    # setup a stream which is when we loop through each line,
-    # and handle each student data in the stream.
-    io_string = io.StringIO(data_set)
-    next(io_string)
-    for column in csv.reader(io_string, delimiter=',', quotechar="|"):
-        raw_password = User.objects.make_random_password()
-        hashed_password = make_password(raw_password)
-        usernames = column[0][0].lower() + column[1].lower()
-        _, lecturer_details = Users.objects.update_or_create(
-            password=hashed_password,
-            last_login="2020-08-03 09:46:42.521991",
-            is_superuser="0",
-            username=usernames,
-            first_name=column[0],
-            last_name=column[1],
-            is_staff="0",
-            is_active="1",
-            date_joined="2020-08-03 09:46:42",
-            is_student="0",
-            is_lecturer="1",
-            phone=column[2],
-            picture=None,
-            email=column[3])
-        default_password_staff.delay(usernames, raw_password)
-    context = {}
-    return render(request, template, context)
+        # setup a stream which is when we loop through each line,
+        # and handle each student data in the stream.
+        io_string = io.StringIO(data_set)
+        next(io_string)
+        try:    
+            for column in csv.reader(io_string, delimiter=',', quotechar="|"):
+                raw_password = User.objects.make_random_password()
+                hashed_password = make_password(raw_password)
+                usernames = column[0][0].lower() + column[1].lower()
+                _, lecturer_details = Users.objects.update_or_create(
+                    password=hashed_password,
+                    last_login=f"{dt}",
+                    is_superuser="0",
+                    username=usernames,
+                    first_name=column[0],
+                    last_name=column[1],
+                    is_staff="0",
+                    is_active="1",
+                    date_joined=f"{dt}",
+                    is_student="0",
+                    is_lecturer="1",
+                    phone=column[2],
+                    address=column[3],
+                    picture=None,
+                    email=column[4])
+                staff_reg.delay(usernames, raw_password)
+                staff_reg_sms(usernames, raw_password)
+        except IndexError:
+            # TODO : catch other Possible Exceptions: IndexError, Integrity Error
+            messages.error(request, "Error!!!:  Your CSV files is incomplete")
+            return redirect('add_new_staff')
+        except IntegrityError:
+            messages.error(request, "Error!!!:  Your CSV files is contains details \
+                                    of another user student")
+            return redirect('add_new_staff')
+        return redirect('staff_list')
 
 
 @login_required
@@ -516,62 +539,88 @@ def StudentAddView(request):
 
     if request.method == "GET":
         return render(request, template, prompt)
+    else:
+        try:
+            csv_file = request.FILES['file']
+        except MultiValueDictKeyError:
+            messages.error(request, "Error!!!:  Sorry, you need to upload a file!")
+            return redirect('add_new_student')
 
-    csv_file = request.FILES['file']
-    csv_file_w = csv_file
+        if not csv_file.name.endswith('.csv'):
+            messages.error(request,"This is not a CSV file")
+            return redirect('add_new_student')
+        data_set = csv_file.read().decode('UTF-8')
+        io_string = io.StringIO(data_set)
+        next(io_string)
+        try:
+            for column in csv.reader(io_string, delimiter=',', quotechar="|"):
+                raw_password = User.objects.make_random_password()
+                hashed_password = make_password(raw_password)
+                usernames = column[0][0].lower() + column[1].lower()
+                _, student_details = Users.objects.update_or_create(
+                    password=hashed_password,
+                    last_login=f"{dt}",
+                    is_superuser="0",
+                    username=usernames,
+                    first_name=column[0],
+                    last_name=column[1],
+                    is_staff="0",
+                    is_active="1",
+                    date_joined=f"{dt}",
+                    is_student="1",
+                    is_lecturer="0",
+                    phone=column[6],
+                    address=column[7],
+                    email=column[8])
+                _, student_profile = Student.objects.update_or_create(
+                    user=User.objects.get(username=usernames),
+                    id_number=column[2],
+                    level=column[3],
+                    department=column[4],
+                    faculty=column[5])
+                student_reg.delay(column[2], raw_password)
+                student_reg_sms(column[2], raw_password)
+        except IndexError:
+            # TODO : catch other Possible Exceptions: IndexError, Integrity Error
+            messages.error(request, "Error!!!:  Your CSV files is incomplete")
+            return redirect('add_new_student')
+        except IntegrityError:
+            messages.error(request, "Error!!!:  Your CSV files is contains details \
+                                    of another user student")
+            return redirect('add_new_student')
+        return redirect('student_list')
 
-    if not csv_file.name.endswith('.csv'):
-        HttpResponseRedirect(request, "This is not a CSV file")
-
-    data_set = csv_file.read().decode('UTF-8')
-    io_string = io.StringIO(data_set)
-    next(io_string)
-    try:
-        for column in csv.reader(io_string, delimiter=',', quotechar="|"):
-            raw_password = User.objects.make_random_password()
-            hashed_password = make_password(raw_password)
-            usernames = column[0][0].lower() + column[1].lower()
-            _, student_details = Users.objects.update_or_create(
-                password=hashed_password,
-                last_login="2020-08-03 09:46:42.521991",
-                is_superuser="0",
-                username=usernames,
-                first_name=column[0],
-                last_name=column[1],
-                is_staff="0",
-                is_active="1",
-                date_joined="2020-08-03 09:46:42",
-                is_student="1",
-                is_lecturer="0",
-                phone=column[6],
-                email=column[7])
-            _, student_profile = Student.objects.update_or_create(
-                user=User.objects.get(username=usernames),
-                id_number=column[2],
-                level=column[3],
-                department=column[4],
-                faculty=column[5])
-            default_password_mail.delay(column[2], raw_password)
-            default_password_sms(column[2], raw_password)
-    except IndexError:
-        # TODO : catch other Possible Exceptions: IndexError, Integrity Error
-        messages.error(request, "Index Error:  Your CSV files is incomplete")
-    context = {}
-    return render(request, template, context)
-
-def default_password_sms(id_number, pwd):
+def student_reg_sms(id_number, pwd):
     """
-    Task to send registration details to student's mobile number.
+    Twilio Task to send login details to student's phone number upon student 
+    bulk upload.
     """
     student = Student.objects.get(id_number=id_number)
     message = client.messages \
         .create(
             messaging_service_sid=config('messaging_service_sid'),
-            body=f'Dear {student.user.first_name},\n\n'
+            body=f'Dear {student.user.get_full_name},\n\n'
             f'You have been successfully Registered to University Eportal.'
             f'Your Matric Number is: {id_number} and '
             f'Your Password is: {pwd}',
             to=student.user.phone
+        )
+    return message
+
+def staff_reg_sms(username, pwd):
+    """
+    Twilio Task to send login details to staff's phone number upon staff 
+    bulk upload.
+    """
+    staff = User.objects.get(username=username)
+    message = client.messages \
+        .create(
+            messaging_service_sid=config('messaging_service_sid'),
+            body=f'Dear {staff.get_full_name},\n\n'
+            f'You have been successfully Registered to University Eportal.'
+            f'Your Username is: {username} and '
+            f'Your Password is: {pwd}',
+            to=staff.phone
         )
     return message
 
@@ -604,30 +653,39 @@ def CourseAddView(request):
     prompt = {'order': 'upload courses in csv format'}
     if request.method == "GET":
         return render(request, template, prompt)
-    csv_file = request.FILES['file']
+    else:
+        try:
+            csv_file = request.FILES['file']
+        except MultiValueDictKeyError:
+            messages.error(request, "You need to upload a file!!")
+            return redirect('add_new_course')
+        if not csv_file.name.endswith('.csv'):
+            messages.error(request, "You just uploaded a wrong file")
+            return redirect('add_new_course')
 
-    if not csv_file.name.endswith('.csv'):
-        HttpResponseRedirect(request, "You just uploaded a wrong file")
-
-    data_set = csv_file.read().decode('UTF-8')
-
-    io_string = io.StringIO(data_set)
-    next(io_string)
-    try:
-        for column in csv.reader(io_string, delimiter=',', quotechar="|"):
-            _, courses = Course.objects.update_or_create(
-                courseTitle=column[0],
-                courseCode=column[1],
-                courseUnit=column[2],
-                description=column[3],
-                level=column[4],
-                semester=column[5],
-                is_elective=column[6]
-            )
-    except:
-        messages.error(request, "Integrity Error:  course already exists")
-    context = {}
-    return redirect('course_list')
+        data_set = csv_file.read().decode('UTF-8')
+        io_string = io.StringIO(data_set)
+        next(io_string)
+        try:
+            for column in csv.reader(io_string, delimiter=',', quotechar="|"):
+                _, courses = Course.objects.update_or_create(
+                    courseTitle=column[0],
+                    courseCode=column[1],
+                    courseUnit=column[2],
+                    description=column[3],
+                    level=column[4],
+                    semester=column[5],
+                    is_elective=column[6]
+                )
+        except IndexError:
+            # TODO : catch other Possible Exceptions: IndexError, Integrity Error
+            messages.error(request, "Error!!!:  Your CSV files is incomplete")
+            return redirect('add_new_course')
+        except IntegrityError:
+            messages.error(request, "Error!!!:  Your CSV files is contains course(s) \
+                                    that is already in the database.")
+            return redirect('add_new_course')
+        return redirect('course_list')
 
 
 @login_required
@@ -681,26 +739,41 @@ def course_allocation_upload(request):
     prompt = {'order': 'upload courses_allocations in csv format'}
     if request.method == "GET":
         return render(request, template, prompt)
-
-    csv_file = request.FILES['file']
-
-    if not csv_file.name.endswith('.csv'):
-        HttpResponseRedirect(request, "You just uploaded a wrong file")
-
-    data_set = csv_file.read().decode('UTF-8')
-    io_string = io.StringIO(data_set)
-    next(io_string)
-    for column in csv.reader(io_string, delimiter=',', quotechar="|"):
+    else:
         try:
-            allocations = CourseAllocation.objects.get(
-                lecturer=User.objects.get(username=column[0]))
-        except:
-            allocations = CourseAllocation.objects.create(
-                lecturer=User.objects.get(username=column[0]))
-        allocations.courses.add(Course.objects.get(courseCode=column[1]))
-        allocations.save()
-    context = {}
-    return redirect('course_allocation_view')
+            csv_file = request.FILES['file']
+        except MultiValueDictKeyError:
+            messages.error(request, "Error!!!:  Sorry, you need to upload a file!")
+            return redirect('course_allocation_upload')
+
+        if not csv_file.name.endswith('.csv'):
+            messages.error(request, "You just uploaded a wrong file")
+            return redirect('course_allocation_upload')
+
+        data_set = csv_file.read().decode('UTF-8')
+        io_string = io.StringIO(data_set)
+        next(io_string)
+        try:
+            for column in csv.reader(io_string, delimiter=',', quotechar="|"):
+                try:
+                    allocations = CourseAllocation.objects.get(
+                        lecturer=User.objects.get(username=column[0]))
+                except:
+                    allocations = CourseAllocation.objects.create(
+                        lecturer=User.objects.get(username=column[0]))
+                allocations.courses.add(Course.objects.get(courseCode=column[1]))
+                allocations.save()
+            context = {}
+            return redirect('course_allocation_view')
+        except IndexError:
+        # TODO : catch other Possible Exceptions: IndexError, Integrity Error
+            messages.error(request, "Error!!!:  Your CSV files is incomplete")
+            return redirect('course_allocation_upload')
+        except IntegrityError:
+            messages.error(request, "Error!!!:  Your CSV files is contains details \
+                                    of another user student")
+            return redirect('course_allocation_upload')
+        return redirect('course_allocation_view')
 
 
 @login_required
@@ -738,6 +811,7 @@ def carry_over(request):
         data.pop('csrfmiddlewaretoken', None)  # remove csrf_token
         for val in data.values():
             value += (val,)
+        print(value)
         course = value[0]
         session = value[1]
         courses = CarryOverStudent.objects.filter(course__courseCode=course,
@@ -1092,33 +1166,50 @@ def add_score_for(request, id):
             cas = ()
             exams = ()
             sessh = None
-            csv_file = request.FILES['file']
+            try:
+                csv_file = request.FILES['file']
+            except MultiValueDictKeyError:
+                messages.error(request, "Error!!!:  Sorry, you need to upload a file!")
+                return redirect('add_score_for', id=id)
+            if not csv_file.name.endswith('.csv'):
+                messages.error(request, "You just uploaded a wrong file")
+                return redirect('add_score_for', id=id)
             data_set = csv_file.read().decode('UTF-8')
             io_string = io.StringIO(data_set)
             if request.user.is_lecturer: 
                 for skip in range(11):
                     next(io_string)
-                for column in csv.reader(io_string, delimiter=',', quotechar="|"):
-                    try:
-                        print(column[2])
-                        ids = ids + (column[2],)
-                        print(column[9])
-                        cas = cas + (column[9],)
-                        print(column[16])
-                        exams = exams + (column[16],)
-                    except:
-                        continue
+                try:
+                    for column in csv.reader(io_string, delimiter=',', quotechar="|"):
+                        try:
+                            print(column[2])
+                            ids = ids + (column[2],)
+                            print(column[9])
+                            cas = cas + (column[9],)
+                            print(column[16])
+                            exams = exams + (column[16],)
+                        except:
+                            continue
+                except IndexError:
+                # TODO : catch other Possible Exceptions: IndexError, Integrity Error
+                    messages.error(request, "Error!!!:  Your CSV files is incomplete")
+                    return redirect('add_score_for,', id=id)
             else:
-                for column in csv.reader(io_string, delimiter=',', quotechar="|"):
-                    sessh = column[0]
-                    print(sessh)
-                    break
-                for skip in range(11):
-                    next(io_string)
-                for column in csv.reader(io_string, delimiter=',', quotechar="|"):
-                    ids = ids + (column[2],)
-                    cas = cas + (column[9],)
-                    exams = exams + (column[16],)
+                try:
+                    for column in csv.reader(io_string, delimiter=',', quotechar="|"):
+                        sessh = column[0]
+                        print(sessh)
+                        break
+                    for skip in range(11):
+                        next(io_string)
+                    for column in csv.reader(io_string, delimiter=',', quotechar="|"):
+                        ids = ids + (column[2],)
+                        cas = cas + (column[9],)
+                        exams = exams + (column[16],)
+                except IndexError:
+                # TODO : catch other Possible Exceptions: IndexError, Integrity Error
+                    messages.error(request, "Error!!!:  Your CSV files is incomplete")
+                    return redirect('add_score_for', id=id)
             for s in range(0, len(ids)):
                 try:
                     stu = Student.objects.get(id_number=ids[s])

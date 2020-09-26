@@ -1,6 +1,6 @@
 """
     This script basically allows me to use the same views for multiple users
-    while restricting specific aspects if the view from other users.
+    while restricting specific aspects of the view from other users.
 """
 from django.contrib.auth import REDIRECT_FIELD_NAME
 from django.contrib.auth.decorators import user_passes_test
@@ -8,14 +8,8 @@ from django.contrib.auth.decorators import user_passes_test
 
 def student_required(function=None, redirect_field_name=REDIRECT_FIELD_NAME, login_url='login'):
     """
-
-    Decorator for views that checks that the logged in user is a student,
+    Decorator for views that checks that the logged in user is a student, 
     redirects to the log-in page if necessary.
-
-    :param function:
-    :param redirect_field_name:
-    :param login_url:
-    :return:
     """
     actual_decorator = user_passes_test(
         lambda u: u.is_active and u.is_student,
@@ -29,13 +23,8 @@ def student_required(function=None, redirect_field_name=REDIRECT_FIELD_NAME, log
 
 def lecturer_required(function=None, redirect_field_name=REDIRECT_FIELD_NAME, login_url='login'):
     """
-    Decorator for views that checks that the logged in user is a teacher,
+    Decorator for views that checks that the logged in user is a lecturer,
     redirects to the log-in page if necessary.
-
-    :param function:
-    :param redirect_field_name:
-    :param login_url:
-    :return:
     """
     actual_decorator = user_passes_test(
         lambda u: u.is_active and u.is_lecturer,
@@ -49,8 +38,7 @@ def lecturer_required(function=None, redirect_field_name=REDIRECT_FIELD_NAME, lo
 
 def admin_required(function=None, redirect_field_name=REDIRECT_FIELD_NAME, login_url='login'):
     """
-
-    Decorator for views that checks that the logged in user is a teacher,
+    Decorator for views that checks that the logged in user is an Administrator,
     redirects to the log-in page if necessary.
     """
 

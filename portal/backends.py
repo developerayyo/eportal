@@ -1,18 +1,12 @@
-"""
-This specific script allows us to define custom authentication backend
-for this application. Django by default allows users to be authenticated
-with the username name and password but for the sake of this program I needed
-to give students the option to login in either with their username or
-matric/id number .
-"""
 from django.contrib.auth.backends import ModelBackend
 
 from .models import Student
 
 class StudentBackend(ModelBackend):
     """
-    Custom authentication backend for students that
-    inherits from  django modelbackend.
+    Custom authentication backend for students that inherits from  django 
+    BodelBackend. This allow student to sign-in with their matric no order than 
+    their username.
     """
     def authenticate(self, request, **kwargs):
         id_number = kwargs['username']
