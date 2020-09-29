@@ -1032,7 +1032,7 @@ def course_registration_pdf(request):
         'Content-Disposition'] = f'attachment; filename="{student.user.get_full_name()}_{current_semester}-Semester-{current_session}_courseReg.pdf"'
     weasyprint.HTML(string=html, base_url=request.build_absolute_uri()).write_pdf(
         response,
-        stylesheets=[weasyprint.CSS(settings.STATIC_ROOT + '/css/pdf.css')])
+        stylesheets=[weasyprint.CSS(settings.STATIC_ROOT + '/assets/css/pdf.css')])
     return response
 
 
@@ -1087,7 +1087,7 @@ def result_pdf(request):
         'Content-Disposition'] = f'attachment; filename="{student.user.get_full_name()}_{current_semester}-Semester-{current_session}_result.pdf"'
     weasyprint.HTML(string=html, base_url=request.build_absolute_uri()).write_pdf(
         response,
-        stylesheets=[weasyprint.CSS(settings.STATIC_ROOT + '/css/resultpdf.css')])
+        stylesheets=[weasyprint.CSS(settings.STATIC_ROOT + '/assets/css/resultpdf.css')])
     if w.toggle:
         return response
     else:
@@ -1418,7 +1418,7 @@ def mastersheet(request):
             response = HttpResponse(content_type='application/pdf')
             response['Content-Disposition'] = f'attachment; filename="{dept}_{level}Level_mastersheet.pdf"'
             weasyprint.HTML(string=html, base_url=request.build_absolute_uri()).write_pdf(response,
-                stylesheets=[weasyprint.CSS(settings.STATIC_ROOT + '/css/mastersheetpdf.css')]
+                stylesheets=[weasyprint.CSS(settings.STATIC_ROOT + '/assets/css/mastersheetpdf.css')]
                 )
             return response
     else:

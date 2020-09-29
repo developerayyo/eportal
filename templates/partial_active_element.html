@@ -1,104 +1,126 @@
-<div class="list-group list-group-flush">
-    <a href="/" class="list-group-item 
-        {% if active == 'Dashboard' %} active {% endif %} waves-effect">
-        <i class="fa fa-puzzle-piece mr-3" aria-hidden="true"></i>Dashboard</a>
-    
-    <a href="{% url 'profile' %}" class="list-group-item 
-        {% if active == 'Profile' %} active {% endif %} waves-effect">
-        <i class="fa fa-user mr-3" aria-hidden="true"></i>Profile</a>
-
+<ul class="nav">
+    <li class="nav-item {% if active == 'Dashboard' %} active {% endif %}">
+        <a class="nav-link" href="/">
+          <i class="material-icons">dashboard</i>
+          <p> Dashboard </p>
+        </a>
+    </li>
     {% if request.user.is_superuser %}
-    <a href="{% url 'student_list' %}" class="list-group-item 
-        {% if active == 'students' %} active {% endif %} waves-effect">
-        <i class="fa fa-users mr-3" aria-hidden="true"></i> Students</a>
-        {% endif %}
-
-    {% if request.user.is_superuser %}
-    <a href="{% url 'staff_list' %}" class="list-group-item 
-        {% if active == 'staff' %} active {% endif %} waves-effect">
-        <i class="fa  fa-users mr-3" aria-hidden="true"></i> Staff</a>
-        {% endif %}
-
-    {% if request.user.is_superuser %}
-    <a href="{% url 'course_list' %}" class="list-group-item 
-        {% if active == 'course_list' %} active {% endif %} waves-effect">
-        <i class="fa fa-book mr-3" aria-hidden="true"></i> Courses</a>
+        <li class="nav-item {% if active == 'students' %} active {% endif %}">
+            <a class="nav-link" href="{% url 'student_list' %}">
+            <i class="material-icons">groups</i>
+            <p> Students </p>
+            </a>
+        </li>
     {% endif %}
-
     {% if request.user.is_superuser %}
-    <a href="{% url 'course_allocation' %}" class="list-group-item 
-        {% if active == 'course_allocation' %} active {% endif %} waves-effect">
-        <i class="fa fa-book mr-3" aria-hidden="true"></i>Course Allocation</a>
+        <li class="nav-item {% if active == 'staff' %} active {% endif %}">
+            <a class="nav-link" href="{% url 'staff_list' %}">
+            <i class="material-icons">supervisor_account</i>
+            <p> Staff </p>
+            </a>
+        </li>
     {% endif %}
-
     {% if request.user.is_superuser %}
-    <a href="{% url 'course_allocation_view' %}" class="list-group-item 
-        {% if active == 'course_allocation_view' %} active {% endif %} waves-effect">
-        <i class="fa fa-book mr-3" aria-hidden="true"></i>Allocation List</a>
+        <li class="nav-item {% if active == 'course_list' %} active {% endif %}">
+            <a class="nav-link" href="{% url 'course_list' %}">
+            <i class="material-icons">library_books</i>
+            <p> Courses </p>
+            </a>
+        </li>
     {% endif %}
-
     {% if request.user.is_superuser %}
-    <a href="{% url 'result' %}" class="list-group-item 
-        {% if active == 'Result' %} active {% endif %} waves-effect">
-        <i class="fa fa-book mr-3" aria-hidden="true"></i>Result</a>
+        <li class="nav-item {% if active == 'course_allocation' %} active {% endif %}">
+            <a class="nav-link" href="{% url 'course_allocation' %}">
+            <i class="material-icons">assignment_ind</i>
+            <p> Course Allocation </p>
+            </a>
+        </li>
     {% endif %}
-
     {% if request.user.is_superuser %}
-    <a href="{% url 'mastersheet' %}" class="list-group-item 
-        {% if active == 'Mastersheet' %} active {% endif %} waves-effect">
-        <i class="fa fa-book mr-3" aria-hidden="true"></i>Mastersheet</a>
+        <li class="nav-item {% if active == 'course_allocation_view' %} active {% endif %}">
+            <a class="nav-link" href="{% url 'course_allocation_view' %}">
+            <i class="material-icons">assignment_ind</i>
+            <p> Allocation List </p>
+            </a>
+        </li>
     {% endif %}
-
+    {% if request.user.is_superuser %}
+        <li class="nav-item {% if active == 'Result' %} active {% endif %}">
+            <a class="nav-link" href="{% url 'result' %}">
+            <i class="material-icons">book</i>
+            <p> Result </p>
+            </a>
+        </li>
+    {% endif %}
+    {% if request.user.is_superuser %}
+        <li class="nav-item {% if active == 'Mastersheet' %} active {% endif %}">
+            <a class="nav-link" href="{% url 'mastersheet' %}">
+            <i class="material-icons">assignment_ind</i>
+            <p> Mastersheet </p>
+            </a>
+        </li>
+    {% endif %}
     {% if request.user.is_student %}
-    <a href="{% url 'course_registration' %}" class="list-group-item 
-        {% if active == 'course_registration' %} active {% endif %} waves-effect">
-        <i class="fa fa-book mr-3" aria-hidden="true"></i>Course Resgistration</a>
+        <li class="nav-item {% if active == 'course_registration' %} active {% endif %}">
+            <a class="nav-link" href="{% url 'course_registration' %}">
+            <i class="material-icons">assignment_ind</i>
+            <p> Course Registration </p>
+            </a>
+        </li>
     {% endif %}
-    
     {% if request.user.is_student %}
-    <a href="{% url 'registered_courses' %}" class="list-group-item 
-        {% if active == 'registered_courses' %} active {% endif %} waves-effect">
-        <i class="fa fa-book mr-3" aria-hidden="true"></i>Registered Courses</a>
+        <li class="nav-item {% if active == 'registered_courses' %} active {% endif %}">
+            <a class="nav-link" href="{% url 'registered_courses' %}">
+            <i class="material-icons">library_books</i>
+            <p> Registered Courses </p>
+            </a>
+        </li>
     {% endif %}
-
+    {% if request.user.is_student %}
+        <li class="nav-item {% if active == 'view_results' %} active {% endif %}">
+            <a class="nav-link" href="{% url 'view_results' %}">
+            <i class="material-icons">note</i>
+            <p> View Result </p>
+            </a>
+        </li>
+    {% endif %}
     {% if request.user.is_lecturer %}
-    <a href="{% url 'add_score' %}" class="list-group-item 
-        {% if active == 'Add_Score' %} active {% endif %} waves-effect">
-        <i class="fa fa-book mr-3" aria-hidden="true"></i>
-        Upload Scoresheet
-    </a>
+        <li class="nav-item {% if active == 'Add_Score' %} active {% endif %}">
+            <a class="nav-link" href="{% url 'add_score' %}">
+            <i class="material-icons">publish</i>
+            <p> Upload Scoresheet </p>
+            </a>
+        </li>
     {% endif %}
-    
-    {% if request.user.is_student %}
-    <a href="{% url 'view_results' %}" class="list-group-item 
-        {% if active == 'view_results' %} active {% endif %} waves-effect">
-        <i class="fa fa-eye mr-3" aria-hidden="true"></i>     
-             View Result</a>
-    {% endif %}
-
-    <a href="{% url 'change_password' %}" class="list-group-item 
-        {% if active == 'change_password' %} active {% endif %} waves-effect">
-    <i class="fa  fa-key mr-3" aria-hidden="true"></i>Change Password</a>
-
+    <li class="nav-item {% if active == 'change_password' %} active {% endif %}">
+        <a class="nav-link" href="{% url 'change_password' %}">
+        <i class="material-icons">fingerprint</i>
+        <p> Change Password </p>
+        </a>
+    </li>
     {% if request.user.is_superuser %}
-    <a href="{% url 'manage_session' %}" class="list-group-item 
-        {% if active == 'manage_session' %} active {% endif %} waves-effect">
-        <i class="fa  fa-cogs mr-3" aria-hidden="true"></i>Session Setting</a>
+        <li class="nav-item {% if active == 'manage_session' %} active {% endif %}">
+            <a class="nav-link" href="{% url 'manage_session' %}">
+            <i class="material-icons">miscellaneous_services</i>
+            <p> Session Settings </p>
+            </a>
+        </li>
     {% endif %}
-
     {% if request.user.is_superuser %}
-    <a href="{% url 'manage_semester' %}" class="list-group-item 
-        {% if active == 'manage_semester' %} active {% endif %} waves-effect">
-        <i class="fa  fa-cogs mr-3" aria-hidden="true"></i>Semester Setting</a>
+        <li class="nav-item {% if active == 'manage_semester' %} active {% endif %}">
+            <a class="nav-link" href="{% url 'manage_semester' %}">
+            <i class="material-icons">miscellaneous_services</i>
+            <p> Semester Settings </p>
+            </a>
+        </li>
     {% endif %}
-    
-    <a href="#" class="list-group-item 
-        {% if active == 'payment' %} active {% endif %} waves-effect">
-        <i class="fa  fa-book mr-3" aria-hidden="true"></i>Wiki How</a>
-
     {% if request.user.is_superuser %}
-    <a href="#" class="list-group-item 
-        {% if active == 'system_setting' %} active {% endif %} waves-effect">
-        <i class="fa  fa-cogs mr-3" aria-hidden="true"></i>System setting</a>
+        <li class="nav-item {% if active == 'system_settings' %} active {% endif %}">
+            <a class="nav-link" href="#">
+            <i class="material-icons">settings</i>
+            <p> System Settings </p>
+            </a>
+        </li>
     {% endif %}
-</div>
+</ul>
