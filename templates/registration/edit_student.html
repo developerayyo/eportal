@@ -30,7 +30,7 @@
         </h4>
       </div>
       <div class="card-body">
-        <form method="post">{% csrf_token %}
+        <form role="form" method="post" enctype="multipart/form-data">{% csrf_token %}
           <div class="row">
             <div class="col-md-5">
               <div class="form-group">
@@ -96,7 +96,7 @@
                       <h4 class="title">Update Passport</h4>
                       <div class="fileinput fileinput-new text-center" data-provides="fileinput">
                         <div class="fileinput-new thumbnail">
-                          <img src="{{ student.user.get_picture }}" alt="...">
+                          <img src="{{ user.get_picture }}" alt="...">
                         </div>
                         <div class="fileinput-preview fileinput-exists thumbnail"></div>
                         <div>

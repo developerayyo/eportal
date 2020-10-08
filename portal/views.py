@@ -568,7 +568,10 @@ def edit_staff(request, pk):
     user = get_object_or_404(User, pk=pk)
     if request.method == "POST":
         form = ProfileForm(request.POST or None, request.FILES or None, instance=user)
+        print('---------------------')
+        print(form.errors)
         print(form.is_valid())
+        print('---------------------')
         if form.is_valid():
             user.username = form.cleaned_data.get('username')
             user.first_name = form.cleaned_data.get('firstname')
@@ -706,13 +709,18 @@ def staff_reg_sms(username, pwd):
     return message
 
 
+
 @login_required
 @admin_required
 def edit_student(request, pk):
     student = get_object_or_404(Student, pk=pk)
-    user = get_object_or_404(User, pk=student.user.pk)
+    user = get_object_or_404(User, pk=student.user.id)
     if request.method == "POST":
         form = ProfileForm(request.POST or None, request.FILES or None, instance=user)
+        print('---------------------')
+        print(form.errors)
+        print(form.is_valid())
+        print('---------------------')
         if form.is_valid():
             user.username = form.cleaned_data.get('username')
             user.first_name = form.cleaned_data.get('firstname')
