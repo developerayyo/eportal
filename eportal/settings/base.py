@@ -31,6 +31,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django.contrib.humanize',
+    'widget_tweaks',
     'crispy_forms',
     'import_export',
     'rest_framework',
@@ -113,6 +114,8 @@ TEMPLATES[0]['OPTIONS']['context_processors'].append(
     "portal.context_processors.semester_processor")
 TEMPLATES[0]['OPTIONS']['context_processors'].append(
     "portal.context_processors.session_processor")
+TEMPLATES[0]['OPTIONS']['context_processors'].append(
+    "portal.context_processors.result_render_processor")
 
 
 EMAIL_SUBJECT_PREFIX = 'EportalProject Support'
@@ -131,7 +134,7 @@ AUTHENTICATION_BACKENDS = [
 REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': [
         'rest_framework.permissions.DjangoModelPermissionsOrAnonReadOnly'
-    ]
+    ],
 }
 
 IMPORT_EXPORT_USE_TRANSACTIONS = True

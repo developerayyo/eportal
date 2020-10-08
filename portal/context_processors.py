@@ -1,6 +1,6 @@
 import datetime
 
-from .models import Session, Semester, FIRST
+from .models import Session, Semester, FIRST, ResultRender
 
 y = datetime.datetime.today()
 session = str(y.year) + " / " + str(y.year + 1)
@@ -26,3 +26,7 @@ def session_processor(request):
 def semester_processor(request):
     current_semester = Semester.objects.get(is_current_semester=True)
     return {"current_semester": current_semester}
+
+def result_render_processor(request):
+    w, created = ResultRender.objects.get_or_create(id=1)
+    return {"result_render": w}

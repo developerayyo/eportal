@@ -1,15 +1,15 @@
 {% extends 'base.html' %}
+{% load widget_tweaks %}
 
 {% load crispy_forms_tags %}
-{% block title %}ACRRPS | Edit Lecturer{% endblock title %}
+{% block title %}ACRRPS | Edit Staff{% endblock title %}
 
 {% block side_bar %}
     {% include 'partial_active_element.html' with active='staff' %}
 {% endblock side_bar %}
 
 {% block content %}
-<div class="container-fluid mt-5">
-        {% if messages %}
+  {% if messages %}
         {% for message in messages %}
           <div class="alert alert-success alert-dismissable">
             <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
@@ -17,76 +17,82 @@
           </div>
         {% endfor %}
       {% endif %}
-<!-- Extended material form grid -->
-<form method="post">{% csrf_token %}
-  <!-- Grid row -->
-  <div class="form-row">
-    <!-- Grid column -->
-    <div class="col-md-4">
-      <!-- Material input -->
-      <div class="md-form form-group">
-        <i class="fa fa-user prefix"></i>
-        {{ form.username }}
-        <label for="inputEmail4MD">{{ form.username.label }}</label>
-        {{ form.username.errors }}
+<div class="row">
+<div class="col-md-2"></div>
+  <div class="col-md-8">
+    <div class="card">
+      <div class="card-header card-header-icon card-header-rose">
+        <div class="card-icon">
+          <i class="material-icons">perm_identity</i>
+        </div>
+        <h4 class="card-title">Edit Profile -
+          <small class="category">edit staff profile</small>
+        </h4>
+      </div>
+      <div class="card-body">
+        <form method="post" enctype="multipart/form-data">{% csrf_token %}
+          <div class="row">
+            <div class="col-md-5">
+              <div class="form-group">
+                <label class="bmd-label-floating ">{{form.phone.label}}</label>
+                {{form.phone}}
+                {{form.phone.errors}}
+              </div>
+            </div>
+            <div class="col-md-3">
+              <div class="form-group">
+                <label class="bmd-label-floating ">{{form.username.label}}</label>
+                {{form.username}}
+              </div>
+            </div>
+            <div class="col-md-4">
+              <div class="form-group">
+                <label class="bmd-label-floating ">{{form.email.label}}</label>
+                {{form.email}}
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="form-group">
+                <label class="bmd-label-floating ">{{form.firstname.label}}</label>
+                {{form.firstname}}
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="form-group">
+                <label class="bmd-label-floating ">{{form.lastname.label}}</label>
+                {{form.lastname}}
+              </div>
+            </div>
+            <div class="col-md-12">
+              <div class="form-group">
+                <label class="bmd-label-floating ">{{form.address.label}}</label>
+                {{form.address}}
+              </div>
+            </div>
+             <div class="col-md-4 col-sm-4">
+                      <h4 class="title">Update Passport</h4>
+                      <div class="fileinput fileinput-new text-center" data-provides="fileinput">
+                        <div class="fileinput-new thumbnail">
+                          <img src="{{ staff.get_picture }}" alt="...">
+                        </div>
+                        <div class="fileinput-preview fileinput-exists thumbnail"></div>
+                        <div>
+                          <span class="btn btn-rose btn-round btn-file">
+                            <span class="fileinput-new">Select image</span>
+                            <span class="fileinput-exists">Change</span>
+                            {{ form.picture }}
+                          </span>
+                          <a href="#" class="btn btn-danger btn-round fileinput-exists" data-dismiss="fileinput"><i class="fa fa-times"></i> Remove</a>
+                        </div>
+                      </div>
+                </div>
+          </div>
+          <button type="submit" class="btn btn-rose pull-right">Update Profile</button>
+          <div class="clearfix"></div>
+        </form>
       </div>
     </div>
-    <!-- Grid column -->
-    <div class="col-md-4">
-      <!-- Material input -->
-      <div class="md-form form-group">
-        <i class="fa fa-dot-circle-o prefix"></i>
-       {{ form.firstname }}
-        <label for="inputCityMD">{{ form.firstname.label }}</label>
-        {{ form.firstname.errors }}
-      </div>
-    </div>
-    <!-- Grid column -->
-    <div class="col-md-4">
-      <!-- Material input -->
-      <div class="md-form form-group">
-        <i class="fa fa-dot-circle-o prefix"></i>
-        {{ form.lastname }}
-        <label for="inputZipMD">{{ form.lastname.label }}</label>
-        {{ form.lastname.errors }}
-      </div>
-    </div>
-    <!-- Grid column -->
   </div>
-  <!-- Grid row -->
-
-  <!-- Grid row -->
-  <div class="row">
-    <div class="col-md-4">
-      <!-- Material input -->
-      <div class="md-form form-group">
-        <i class="fa fa-phone prefix"></i>
-          {{ form.phone }}
-        <label for="inputCityMD">{{ form.phone.label }}</label>
-          {{ form.phone.errors }}
-      </div>
-    </div>
-
-    <div class="col-md-4">
-      <!-- Material input -->
-      <div class="md-form form-group">
-        <i class="fa fa-home prefix"></i>
-        {{ form.address }}
-        <label for="student_address">{{ form.address.label }}</label>
-        {{ form.address.errors }}
-      </div>
-    </div>
-    <div class="col-md-4">
-      <!-- Material input -->
-      <div class="md-form form-group">
-        <i class="fa fa-envelope-open prefix"></i>
-        {{ form.email }}
-        <label for="student_email">{{ form.email.label }}</label>
-        {{ form.email.errors }}
-      </div>
-    </div>
-  </div>
-  <button type="submit" class="btn btn-primary btn-md">Save</button>
-</form>
 </div>
 {% endblock %}
+

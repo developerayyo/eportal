@@ -55,8 +55,8 @@ Students
     * View and print result.
     * Change password.
 * ToDo:
-    * Switch from one session or semester to another.
-    * Add wiki-how section to their view where they can learn how their view works.
+    * Wizard to introduce students to all the components of their view.
+    * Documentation on how student view works.
 
 Lecturers
 ^^^^^^^^^
@@ -65,9 +65,10 @@ Lecturers
     * View List of allocated Courses in the `Profile Section`
     * Upload Scoresheet for each course allocated to them.
     * Download the scoresheet template for each courses allocated to them.
-    * Change their password
+    * Change their password.
 * ToDo:
-    * Add wiki-how section to their view where they can learn how their view works.
+    * Wizard to introduce lecturers to all the components of their view.
+    * Documentation on how lecturer view works.
 
 Administrator
 ^^^^^^^^^^^^^
@@ -81,11 +82,15 @@ Administrator
     * Change password.
     * Change current Session/Semester for the whole school.
     * Add a toggle button to Administrator view that allows him to reveal or hide Result.
-    * Upload old students results to the site
-    * Download Result mastersheet for a selected Department and level
+    * Upload old students results for each course.
+    * Download Result mastersheet for a selected Department and level for the current semester.
+    * Export data from the site to various formats e.g pdf, csv, etc.
+    * filter data
 * ToDo:
-    * export data from the site to various formats e.g pdf, csv, etc.
-    * filter courses/students/staff/others lists.
+    * Upload old students results from a mastersheet for a particular deparment, level and semester.
+    * Promote all students with a single button.
+    * Wizard to introduce administrators to all the components of their view.
+    * Documentation on how administrator view works.
 
 Proposed Enhancements
 =====================

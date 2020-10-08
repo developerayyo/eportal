@@ -6,10 +6,12 @@ app_name = 'portal'
 
 router = routers.DefaultRouter()
 router.register('courses', views.CourseViewSet)
+router.register('students', views.StudentViewSet)
+router.register('lecturers', views.LecturerViewSet)
+router.register('courseallocation', views.CourseAllocationViewSet)
+router.register('sessions', views.SessionViewSet)
+router.register('semesters', views.SemesterViewSet)
 
 urlpatterns = [
-    # path('courses/', views.CourseListView.as_view(), name='course_list'),
-    # path('courses/<pk>/', views.CourseDetailView.as_view(), name='course_detail'),
-    # path('courses/<pk>/enroll/', views.CourseRegistrationView.as_view(), name='course_enroll'),
     path('', include(router.urls)),
 ]

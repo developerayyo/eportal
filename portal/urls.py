@@ -1,4 +1,5 @@
-from django.urls import path, include
+from django.urls import path, include, re_path
+from django.contrib.auth.decorators import login_required
 from . import views
 
 urlpatterns = [
@@ -47,6 +48,9 @@ urlpatterns = [
     path('course/allocated/',
          views.course_allocation_view,
          name='course_allocation_view'),
+    path('course/allocated/me/',
+         views.allocated_courses,
+         name='allocated_courses'),
     path('course/allocation/upload/',
           views.course_allocation_upload,
           name='course_allocation_upload'),
@@ -76,7 +80,6 @@ urlpatterns = [
     path('score/', views.add_score, name='add_score'),
     path('score/<int:id>/', views.add_score_for, name='add_score_for'),
     path('scoresheet/download/<int:id>/', views.scoresheet_download, name='scoresheet_download'),
-    path('results/', views.result, name='result'),
     path('toggles/', views.toggles),
     path('mastersheet/', views.mastersheet, name='mastersheet')
 ]

@@ -1,64 +1,50 @@
-from rest_framework import generics
-from ..models import Course
-from .serializers import CourseSerializer
+from .serializers import (
+    UserSerializer, CourseSerializer, StudentSerializer, SemesterSerializer,
+    CourseAllocationSerializer, SessionSerializer, 
+)
 
-from django.shortcuts import get_object_or_404
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.authentication import BasicAuthentication
 from rest_framework.permissions import IsAuthenticated
-from ..decorators import student_required
-from ..models import TakenCourse, Student
+from ..models import (
+    Course, TakenCourse, Student, User, CourseAllocation, Session, Semester
+)
 
 from rest_framework import viewsets
 from rest_framework.decorators import action
 
-# from .serializers import
+from django.utils.decorators import method_decorator
+from django.contrib.auth.decorators import login_required
+from ..decorators import admin_required
 
-# Intro
-# class CourseListView(generics.ListAPIView):
-#     queryset = Course.objects.all()
-#     serializer_class = CourseSerializer
 
-# class CourseDetailView(generics.RetrieveAPIView):
-#     queryset = Course.objects.all()
-#     serializer_class = CourseSerializer
-    
-# Custom Api View
-# class CourseRegistrationView(APIView):
-#     authentication_classes = (BasicAuthentication,)
-#     permission_classes = (IsAuthenticated,)
+@method_decorator([login_required, admin_required], name='dispatch')
+class StudentViewSet(viewsets.ModelViewSet):
+    queryset = Student.objects.all()
+    serializer_class = StudentSerializer
 
-#     def post(self, request, pk, format=None):
-#         course = get_object_or_404(Course, pk=pk)
-#         try:
-#             student = Student.objects.get(user__pk=request.user.id)
-#         except:
-#             return Response({'Error': 'Make sure your details are correct and make sure you are a student'})
-#         taken_course = TakenCourse.objects.create(student=student, course=course)
-#         taken_course.save()
-#         return Response({'enrolled': True})
+@method_decorator([login_required, admin_required], name='dispatch')
+class LecturerViewSet(viewsets.ModelViewSet):
+    queryset = User.objects.filter(is_lecturer=True)
+    serializer_class = UserSerializer
 
-# Using viewsets which is an improvement over # Intro
-# class CourseViewSet(viewsets.ReadOnlyModelViewSet):
-#     queryset = Course.objects.all()
-#     serializer_class = CourseSerializer
-
-# Lets change CourseRegistrtionView to Custom ViewSets by modifying  CourseViewSet7
-class CourseViewSet(viewsets.ReadOnlyModelViewSet):
+@method_decorator([login_required, admin_required], name='dispatch')
+class CourseViewSet(viewsets.ModelViewSet):
     queryset = Course.objects.all()
     serializer_class = CourseSerializer
-    @action(
-        detail=True,
-        methods=['post'],
-        authentication_classes=[BasicAuthentication],
-        permission_classes=[IsAuthenticated]
-    )
-    def enroll(self, request, *args, **kwargs):
-        course = self.get_object()
-        try:
-            student = Student.objects.get(user__pk=request.user.id)
-        except:
-            return Response({'Error': 'Make sure your details are correct and make sure you are a student'})
-        taken_course = TakenCourse.objects.create(student=student, course=course)
-        return Response({'enrolled': True})
+
+@method_decorator([login_required, admin_required], name='dispatch')
+class CourseAllocationViewSet(viewsets.ModelViewSet):
+    queryset = CourseAllocation.objects.all()
+    serializer_class = CourseAllocationSerializer
+
+@method_decorator([login_required, admin_required], name='dispatch')
+class SessionViewSet(viewsets.ModelViewSet):
+    queryset = Session.objects.all().order_by('-session')
+    serializer_class = SessionSerializer
+
+@method_decorator([login_required, admin_required], name='dispatch')
+class SemesterViewSet(viewsets.ModelViewSet):
+    queryset = Semester.objects.all().order_by('-session')
+    serializer_class = SemesterSerializer

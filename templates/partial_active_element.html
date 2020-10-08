@@ -46,18 +46,10 @@
         </li>
     {% endif %}
     {% if request.user.is_superuser %}
-        <li class="nav-item {% if active == 'Result' %} active {% endif %}">
-            <a class="nav-link" href="{% url 'result' %}">
-            <i class="material-icons">book</i>
-            <p> Result </p>
-            </a>
-        </li>
-    {% endif %}
-    {% if request.user.is_superuser %}
         <li class="nav-item {% if active == 'Mastersheet' %} active {% endif %}">
             <a class="nav-link" href="{% url 'mastersheet' %}">
             <i class="material-icons">assignment_ind</i>
-            <p> Mastersheet </p>
+            <p>Result Mastersheet </p>
             </a>
         </li>
     {% endif %}
@@ -82,6 +74,14 @@
             <a class="nav-link" href="{% url 'view_results' %}">
             <i class="material-icons">note</i>
             <p> View Result </p>
+            </a>
+        </li>
+    {% endif %}
+    {% if request.user.is_lecturer %}
+        <li class="nav-item {% if active == 'allocated_courses' %} active {% endif %}">
+            <a class="nav-link" href="{% url 'allocated_courses' %}">
+            <i class="material-icons">library_books</i>
+            <p>Allocated Courses </p>
             </a>
         </li>
     {% endif %}
@@ -112,14 +112,6 @@
             <a class="nav-link" href="{% url 'manage_semester' %}">
             <i class="material-icons">miscellaneous_services</i>
             <p> Semester Settings </p>
-            </a>
-        </li>
-    {% endif %}
-    {% if request.user.is_superuser %}
-        <li class="nav-item {% if active == 'system_settings' %} active {% endif %}">
-            <a class="nav-link" href="#">
-            <i class="material-icons">settings</i>
-            <p> System Settings </p>
             </a>
         </li>
     {% endif %}

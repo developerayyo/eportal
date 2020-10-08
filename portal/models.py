@@ -158,6 +158,9 @@ class Student(models.Model):
 
     def get_absolute_url(self):
         return reverse('profile')
+    
+    def natural_key(self):
+        return self.user
 
 
 class Course(models.Model):

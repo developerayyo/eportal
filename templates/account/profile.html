@@ -2,164 +2,83 @@
 {% load static %}
 {% load humanize %}
 
-{% block title %}ACRRPS | {{ user|capfirst }}'s' Profile{% endblock title %}
+{% block title %}ACRRPS | {{ user.first_name|capfirst }}'s Profile{% endblock title %}
 
 {% block side_bar %}
     {% include 'partial_active_element.html' with active='Profile' %}
 {% endblock side_bar %}
 
 {% block content %}
-<style type="text/css">
-  .table-wrapper-scroll-y {
-display: block;
-max-height: 350px;
-overflow-y: auto;
--ms-overflow-style: -ms-autohiding-scrollbar;
-}
-</style>
- <div class="container-fluid mt-5">
-
   <div class="row">
-    <div class="col-md-3">
-
-    	<!-- Card -->
-<div class="card">
-
-  <!-- Card image -->
-  <div class="view overlay">
-    <img class="card-img-top" src="{{ request.user.get_picture }}" alt="User Image">
-    <a class="mask" {% if request.user.is_superuser or request.user.is_lecturer %}href="{% url 'edit_profile' %}"{% else %}href="#"{% endif %}>
-      {% if request.user.is_superuser or request.user.is_lecturer %}
-      <div class="mask white-text">Change Picture</div>
-      {% endif %}
-    </a>
-  </div>
-
-{% if request.user.is_lecturer %}
-    <!-- Card content -->
-  <div class="card-body card-body-cascade text-center">
-
-    <small class="card-title">Name: {{ request.user.get_full_name|capfirst }}</small><br>
-    <small class="card-title">Role: Lecturer </small><br>
-    <a href="{% url 'edit_profile' %}" class="btn btn-primary">Edit Profile</a>
-  </div>
-{% endif %}
-
-{% if request.user.is_student %}
-    <!-- Card content -->
-  <div class="card-body card-body-cascade text-center">
-
-    <small class="card-title">Name: {{ request.user.get_full_name|capfirst }}</small><br>
-    <small class="card-title">Role: Student</small><br>
-    <small class="card-title">Level: {{ level.level }}</small>
-  </div>
-{% endif %}
-
-
-{% if request.user.is_superuser %}
-    <!-- Card content -->
-  <div class="card-body card-body-cascade text-center">
-
-    <small>Name: {{ request.user.get_full_name|capfirst }}</small><br>
-    <small>Role: Superuser</small>
-    <a href="{% url 'edit_profile' %}" class="btn btn-primary">Edit Profile</a>
-  </div>
-{% endif %}
-
-
-</div>
-<!-- Card -->
+    <div class="col-md-8">
+      <div class="card">
+        <div class="card-header card-header-icon card-header-rose">
+          <div class="card-icon">
+            <i class="material-icons">perm_identity</i>
+          </div>
+          <h4 class="card-title">Profile -
+            <small class="category">{{ user.first_name|capfirst }}'s profile</small>
+          </h4>
+        </div>
+        <div class="card-body">
+            <div class="row">
+              <div class="col-md-4">
+                  <span type="text" class=""><b>Firstname:</b> {{ request.user.first_name|capfirst }}</span>
+              </div>
+              <div class="col-md-4">
+                <span type="text" class=""><b>Lastname:</b> {{ request.user.last_name|capfirst }}</span>
+              </div>
+              <div class="col-md-4">
+                <span type="text" class=""><b>Email:</b> {{ request.user.email|capfirst }}</span>
+              </div>
+              <br>
+              <br>
+              <div class="col-md-4">
+                <span type="text" class=""><b>Username:</b> {{ request.user.username }}</span>
+              </div>
+              <div class="col-md-4">
+                <span type="text" class=""><b>Phone:</b> {{ request.user.phone }}</span>
+              </div>
+              <div class="col-md-4">
+                <span type="text" class=""><b>Address :</b> {{ request.user.address }}</span>
+              </div>
+              <br>
+              <br>
+              {% if request.user.is_student %}
+              <div class="col-md-4">
+                <span type="text" class=""><b>Level :</b> {{ level.level }}</span>
+              </div>
+              <div class="col-md-4">
+                <span type="text" class=""><b>Matric No :</b> {{ level }}</span>
+              </div>
+              <div class="col-md-4">
+                <span type="text" class=""><b>Department:</b> {{ level.department }}</span>
+              </div>
+              <br>
+              <br>
+              <div class="col-md-4">
+                <span type="text" class=""><b>Faculty:</b> {{ level.faculty }}</span>
+              </div>
+              {% endif %}
+            </div>
+        </div>
+      </div>
     </div>
-    {% if request.user.is_lecturer %}
-    <div class="col-md-7 text-center">
-      <p>Allocated Courses</p>
-  <div class="table-wrapper-scroll-y">
-
-  <table class="table table-bordered table-striped">
-  <thead>
-    <tr>
-      <th scope="col">#</th>
-      <th scope="col">Course Code</th>
-      <th scope="col">Course Title</th>
-      <th scope="col">Course Unit</th>
-      <th scope="col">Scoresheet</th>
-    </tr>
-  </thead>
-  <tbody>
-    {% for course in courses %}
-    <tr>
-      <th scope="row">{{ forloop.counter }}</th>
-      <td>{{ course.courseCode }}</td>
-      <td>{{ course }}</td>
-      <td>{{ course.courseUnit }}</td>
-      <td>
-	  	  <span class="table-remove"><a href="{% url 'scoresheet_download' course.id %}" class="btn btn-info btn-rounded btn-sm my-0">Download</a></span>
-	    </td>
-    </tr>
-    {% empty %}
-    <tr>
-    <td>{{ course.courseCode }}</td>
-      <td></td>
-      <td>No course is assigned to you !</td>
-      <td></td>
-    </tr>
-  {% endfor %}
-  </tbody>
-</table>
+    <div class="col-md-4">
+      <div class="card card-profile">
+        <div class="card-avatar">
+          <a href="#pablo">
+            <img class="img" src="{{ request.user.get_picture }}" />
+          </a>
+        </div>
+        <div class="card-body">
+          <h6 class="card-category text-gray"><b>ROLE:</b> {{type}}</h6>
+          <h4 class="card-title"><b>Fullname:</b> {{ request.user.get_full_name }}</h4>
+          <h4 class="card-title"><b>Status:</b> {% if request.user.is_active == True %}Active{% else %} Inactive {% endif %}</h4>
+          <h4 class="card-title"><b>Registered:</b> {{ request.user.date_joined|naturaltime }}</h4>
+          <a href="#pablo" class="btn btn-rose btn-round">Follow</a>
+        </div>
+      </div>
     </div>
   </div>
-  {% endif %}
-  {% if request.user.is_superuser %}
-    <div class="col-md-7 text-center">
-      <p>All staff list</p>
-  <div class="table-wrapper-scroll-y">
-
-  <table class="table table-bordered table-striped">
-  <thead>
-    <tr>
-      <th scope="col">#</th>
-      <th scope="col">Name</th>
-      <th scope="col">Address</th>
-      <th scope="col">Picture</th>
-      <th scope="col">Action</th>
-    </tr>
-  </thead>
-  <tbody>
-    {% for staff in staff %}
-    <tr>
-      <th scope="row">{{ forloop.counter }}</th>
-      <td>{{ staff.get_full_name|capfirst }}</td>
-      <td>{{ staff.address }}</td>
-      <td>{{ staff.get_picture.url }}</td>
-      <td>
-        <span class="table-remove">
-          <a href="{% url 'user_profile' id=staff.pk%}" class="btn btn-info btn-rounded btn-sm my-0">View</a>
-        </span>
-
-        <span class="table-remove">
-          <a href="" class="btn btn-info btn-rounded btn-sm my-0">Delete</a>
-        </span>
-      </td>
-    </tr>
-    {% empty %}
-    <tr>
-    <td></td>
-      <td></td>
-      <td>No Staff to show !</td>
-      <td></td>
-    </tr>
-  {% endfor %}
-  </tbody>
-</table>
-    </div>
-  </div>
-  {% endif %}
-  <div class="col-md-2 text-center">
-    <small> Registered:<br><date>{{ user.date_joined|naturaltime }}</date></small><hr />
-    <small> Last Login:<br><date>{{ user.last_login|naturaltime }}</date></small><hr />
-    <small> Phone:<br><date>{% if user.phone %}{{ user.phone }}{% endif %}</date></small><hr />
-    <small> Email:<br><date>{{ user.email }}</date></small><hr />
-    <small> Address:<br><date>{{ user.address }}</date></small>
-  </div>
-</div>
 {% endblock %}

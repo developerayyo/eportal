@@ -5,12 +5,20 @@ from django.forms import BaseModelFormSet
 
 from .models import (
     TakenCourse, LEVEL, Student, User, Course, SEMESTER,
-    CourseAllocation, Session, Semester
+    CourseAllocation, Session, Semester, DEPARTMENT, FACULTY
 )
 
 
 
 class StaffAddForm(UserCreationForm):
+    username = forms.CharField(
+        max_length=30,
+        widget=forms.TextInput(attrs={
+            'type': 'text',
+            'class': 'form-control',
+        }),
+        label="Username",
+    )
     address = forms.CharField(
         max_length=30,
         widget=forms.TextInput(attrs={
@@ -55,25 +63,43 @@ class StaffAddForm(UserCreationForm):
         }),
         label="Email",
     )
-
+    picture = forms.ImageField(
+        widget=forms.FileInput(attrs={
+            'type': 'file'
+        }),
+        label="Upload picture",
+        required=False)
     class Meta(UserCreationForm.Meta):
         model = User
+        fields = [
+            'username', 'address', 'phone', 'first_name', 'last_name', 'email', 'picture'
+        ]
 
     @transaction.atomic()
     def save(self, commit=True):
         user = super().save(commit=False)
         user.is_lecturer = True
         user.first_name = self.cleaned_data.get('firstname')
+        user.username = self.cleaned_data.get('username')
         user.last_name = self.cleaned_data.get('lastname')
         user.phone = self.cleaned_data.get('phone')
         user.address = self.cleaned_data.get('address')
         user.email = self.cleaned_data.get('email')
+        user.picture = self.cleaned_data.get('picture')
         if commit:
             user.save()
         return user
 
 
 class StudentAddForm(UserCreationForm):
+    department = forms.CharField(widget=forms.Select(
+        choices=DEPARTMENT, attrs={
+            'class': 'browser-default custom-select',
+        }), )
+    faculty = forms.CharField(widget=forms.Select(
+        choices=FACULTY, attrs={
+            'class': 'browser-default custom-select',
+        }), )
     username = forms.CharField(
         max_length=30,
         widget=forms.TextInput(attrs={
@@ -130,10 +156,19 @@ class StudentAddForm(UserCreationForm):
         }),
         label="Email Address",
     )
+    picture = forms.ImageField(
+        widget=forms.FileInput(attrs={
+            'class': 'form-control',
+            'type': 'file'
+        }),
+        label="Upload picture",
+        required=False)
 
     class Meta(UserCreationForm.Meta):
         model = User
-
+        fields = [
+            'username', 'address', 'phone', 'first_name', 'last_name', 'email', 'picture'
+        ]
     @transaction.atomic()
     def save(self):
         user = super().save(commit=False)
@@ -142,10 +177,14 @@ class StudentAddForm(UserCreationForm):
         user.last_name = self.cleaned_data.get('lastname')
         user.phone = self.cleaned_data.get('phone')
         user.email = self.cleaned_data.get('email')
+        user.picture = self.cleaned_data.get('picture')
         user.save()
         student = Student.objects.create(user=user,
                                          id_number=user.username,
-                                         level=self.cleaned_data.get('level'))
+                                         level=self.cleaned_data.get('level'),
+                                         faculty = self.cleaned_data.get('faculty'),
+                                         department = self.cleaned_data.get('department')
+                                         )
         student.save()
         return user
 
@@ -193,16 +232,66 @@ class CourseRegitsrationForm(forms.ModelForm):
 
 
 class ProfileForm(forms.ModelForm):
+    level = forms.CharField(widget=forms.Select(
+        choices=LEVEL, attrs={
+            'class': 'browser-default custom-select',
+        }),
+        required=False )
+    department = forms.CharField(widget=forms.Select(
+        choices=DEPARTMENT, attrs={
+            'class': 'browser-default custom-select',
+        }),
+        required=False )
+    faculty = forms.CharField(widget=forms.Select(
+        choices=FACULTY, attrs={
+            'class': 'browser-default custom-select',
+        }), 
+        required=False)
+    matric = forms.CharField(
+        widget=forms.TextInput(attrs={'class': 'form-control'}),
+        label="Matric No",
+        max_length=30,
+        required=False)
+    username = forms.CharField(
+        widget=forms.TextInput(attrs={'class': 'form-control'}),
+        label="Username",
+        max_length=30,
+        required=False)
+    firstname = forms.CharField(
+        widget=forms.TextInput(attrs={'class': 'form-control'}),
+        label="Firstname",
+        max_length=30,
+        required=False)
+    lastname = forms.CharField(
+        widget=forms.TextInput(attrs={'class': 'form-control'}),
+        label="Lastname",
+        max_length=30,
+        required=False)
+    email = forms.EmailField(
+        widget=forms.EmailInput(attrs={'class': 'form-control'}),
+        label="Email",
+        max_length=75,
+        required=False)
+    phone = forms.CharField(
+        widget=forms.TextInput(attrs={'class': 'form-control'}),
+        label="Phone Number",
+        max_length=16,
+        required=False)
+
+    address = forms.CharField(
+        widget=forms.TextInput(attrs={'class': 'form-control'}),
+        label="Home Address",
+        max_length=200,
+        required=False)
+
     picture = forms.ImageField(
-        widget=forms.FileInput(attrs={'class': 'form-control'}),
+        widget=forms.FileInput(attrs={'class': 'form-control', 'type': 'file'}),
         label="Upload picture",
         required=False)
 
     class Meta:
         model = User
-        fields = [
-            'picture'
-        ]
+        fields = ['username', 'first_name', 'last_name', 'email', 'phone', 'address', 'picture', ]
 
 class CourseAddForm(forms.ModelForm):
     courseTitle = forms.CharField(
@@ -249,7 +338,7 @@ class CourseAddForm(forms.ModelForm):
         max_length=30,
         widget=forms.Select(choices=SEMESTER,
                             attrs={
-                                'class': 'form-control',
+                                'class': 'browser-default custom-select',
                             }),
         label="*Semester",
     )
@@ -341,7 +430,14 @@ class SemesterForm(forms.ModelForm):
 
 
 class DepartmentLevelForm(forms.ModelForm):
-    
+    department = forms.CharField(widget=forms.Select(
+        choices=DEPARTMENT, attrs={
+            'class': 'browser-default custom-select',
+        }), )
+    level = forms.CharField(widget=forms.Select(
+        choices=LEVEL, attrs={
+            'class': 'browser-default custom-select',
+        }), )
     class Meta:
         model = Student
         fields = ("department", "level",)

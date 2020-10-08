@@ -2,9 +2,14 @@ import csv
 import io
 import datetime
 import weasyprint
+
 from itertools import islice
 from decouple import config
+from twilio.rest import Client
 
+from django.core import serializers
+from django_datatables_view.base_datatable_view import BaseDatatableView
+from django.utils.html import escape
 from django.shortcuts import redirect, render, get_object_or_404
 from django.contrib.auth import update_session_auth_hash, get_user_model
 from django.contrib.auth.decorators import login_required
@@ -14,13 +19,12 @@ from django.http import JsonResponse, HttpResponseRedirect, HttpResponse, Http40
 from django.contrib import messages
 from django.utils.decorators import method_decorator
 from django.views.generic import CreateView
+from django.views.generic.edit import UpdateView
 from django.template.loader import render_to_string
 from django.conf import settings
 from django.urls import reverse_lazy
-
 from django.utils.datastructures import MultiValueDictKeyError
 from django.db import IntegrityError
-# from django.core.exceptions import
 
 
 from .tasks import student_reg, staff_reg
@@ -35,12 +39,13 @@ from .models import (
     ResultRender
 )
 
-from twilio.rest import Client
+
 account_sid = config('account_sid')
 auth_token = config('auth_token')
 client = Client(account_sid, auth_token)
 
 dt = datetime.datetime.today()
+
 
 @login_required
 def home(request):
@@ -57,7 +62,7 @@ def home(request):
     no_of_carry_over_students = CarryOverStudent.objects.all().count()
     no_of_students_to_repeat = RepeatingStudent.objects.all().count()
     form = StudentSessionForm()
-    
+
     context = {
         "no_of_students": students,
         "no_of_staff": staff,
@@ -79,24 +84,44 @@ def profile(request):
     """
     current_semester = Semester.objects.get(is_current_semester=True)
     if request.user.is_lecturer:
+        type = "Lecturer"
         courses = Course.objects.filter(
             allocated_course__lecturer__pk=request.user.id).filter(
             semester=current_semester)
         return render(request, 'account/profile.html', {
             "courses": courses,
+            "type": type
         })
     elif request.user.is_student:
+        type = "Student"
         level = Student.objects.get(user__pk=request.user.id)
         courses = TakenCourse.objects.filter(student__user__id=request.user.id,
                                              course__level=level.level)
         context = {
             'courses': courses,
             'level': level,
+            'type': type
         }
         return render(request, 'account/profile.html', context)
     else:
-        staff = User.objects.filter(is_lecturer=True)
-        return render(request, 'account/profile.html', {"staff": staff})
+        type = "Admin"
+        staff = User.objects.filter(is_superuser=True)
+        return render(request, 'account/profile.html', {"staff": staff, 'type': type})
+
+
+@login_required
+@lecturer_required
+def allocated_courses(request):
+    current_semester = Semester.objects.get(is_current_semester=True)
+    courses = Course.objects.filter(
+            allocated_course__lecturer__pk=request.user.id).filter(
+            semester=current_semester)
+    return render(request, 'course/allocated_courses.html',
+     {
+         "current_semester": current_semester,
+         "courses": courses
+     }
+     )
 
 
 @login_required
@@ -140,26 +165,55 @@ def profile_update(request):
     Check if the fired request is a POST then grab changes and
     update the records otherwise we show an empty form.
     """
-    if not request.user.is_student:
-        user = request.user.id
-        user = User.objects.get(pk=user)
-        if request.method == 'POST':
-            form = ProfileForm(request.POST)
-            if form.is_valid():
-                if request.FILES:
-                    user.picture = request.FILES['picture']
-                user.save()
-                messages.success(request, 'Your profile was successfully edited.')
-                return redirect("/profile/")
-        else:
-            form = ProfileForm(instance=user,
-                            initial={
-                                'picture': user.picture,
-                            })
-
-        return render(request, 'account/profile_update.html', {'form': form})
+    try:
+        students = get_object_or_404(Student, user__pk=request.user.id)
+    except:
+        pass
+    user = request.user.id
+    user = get_object_or_404(User, pk=user)
+    if request.method == 'POST':
+        form = ProfileForm(request.POST or None, request.FILES or None, instance=user)
+        print(form.errors)
+        print(form.is_valid())
+        if form.is_valid():
+            user.username = form.cleaned_data.get('username')
+            user.first_name = form.cleaned_data.get('firstname')
+            user.last_name = form.cleaned_data.get('lastname')
+            user.email = form.cleaned_data.get('email')
+            user.phone = form.cleaned_data.get('phone')
+            user.address = form.cleaned_data.get('address')
+            if request.FILES:
+                user.picture = request.FILES['picture']
+            user.save()
+            messages.success(
+                request, 'Your profile was successfully edited.')
+            return redirect("/profile/")
     else:
-        return redirect('home')
+        if request.user.is_student:
+            form = ProfileForm(instance=user, initial={
+                "username": request.user.username,
+                "firstname": request.user.first_name,
+                "lastname": request.user.last_name,
+                "email": request.user.email,
+                "phone": request.user.phone,
+                "address": request.user.address,
+                "picture": request.user.get_picture,
+                "matric": students.id_number,
+                "level": students.level,
+                "faculty": students.faculty,
+                "department": students.department
+            })
+        else:
+            form = ProfileForm(instance=user, initial={
+                "username": request.user.username,
+                "firstname": request.user.first_name,
+                "lastname": request.user.last_name,
+                "email": request.user.email,
+                "phone": request.user.phone,
+                "address": request.user.address,
+                "picture": request.user.get_picture
+            })
+    return render(request, 'account/profile_update.html', {'form': form})
 
 
 @login_required
@@ -334,15 +388,17 @@ def session_update_view(request, pk):
             if form.is_valid():
                 form.save()
                 messages.success(request, 'Session updated successfully ! ')
+                return redirect('manage_session')
         else:
             form = SessionForm(request.POST, instance=session)
             if form.is_valid():
                 form.save()
                 messages.success(request, 'Session updated successfully ! ')
+                return redirect('manage_session')
 
     else:
         form = SessionForm(instance=session)
-    return render(request, 'result/session_update.html', {'form': form})
+    return render(request, 'result/session_update.html', {'form': form, 'session': session,})
 
 
 @login_required
@@ -383,7 +439,7 @@ def semester_add_view(request):
                     if Semester.objects.get(semester=semester, session=ss):
                         messages.info(
                             request, semester + " semester in " +
-                                     session.session + " session already exist")
+                            session.session + " session already exist")
                         return redirect('create_new_semester')
                 except:
                     semester = Semester.objects.get(is_current_semester=True)
@@ -459,11 +515,12 @@ def StaffAddView(request):
         try:
             csv_file = request.FILES['file']
         except MultiValueDictKeyError:
-            messages.error(request, "Error!!!:  Sorry, you need to upload a file!")
+            messages.error(
+                request, "Error!!!:  Sorry, you need to upload a file!")
             return redirect('add_new_staff')
 
         if not csv_file.name.endswith('.csv'):
-            messages.error(request,"This is not a CSV file")
+            messages.error(request, "This is not a CSV file")
             return redirect('add_new_staff')
         data_set = csv_file.read().decode('UTF-8')
 
@@ -471,7 +528,7 @@ def StaffAddView(request):
         # and handle each student data in the stream.
         io_string = io.StringIO(data_set)
         next(io_string)
-        try:    
+        try:
             for column in csv.reader(io_string, delimiter=',', quotechar="|"):
                 raw_password = User.objects.make_random_password()
                 hashed_password = make_password(raw_password)
@@ -508,15 +565,36 @@ def StaffAddView(request):
 @login_required
 @admin_required
 def edit_staff(request, pk):
-    staff = get_object_or_404(User, pk=pk)
+    user = get_object_or_404(User, pk=pk)
     if request.method == "POST":
-        form = StaffAddForm(request.POST, instance=staff)
+        form = ProfileForm(request.POST or None, request.FILES or None, instance=user)
+        print(form.is_valid())
         if form.is_valid():
-            staff.save()
+            user.username = form.cleaned_data.get('username')
+            user.first_name = form.cleaned_data.get('firstname')
+            user.last_name = form.cleaned_data.get('lastname')
+            user.email = form.cleaned_data.get('email')
+            user.phone = form.cleaned_data.get('phone')
+            user.address = form.cleaned_data.get('address')
+            if request.FILES:
+                user.picture = request.FILES['picture']
+            user.save()
             return redirect('staff_list')
     else:
-        form = StaffAddForm(instance=staff)
-    return render(request, 'registration/edit_staff.html', {'form': form})
+        form = ProfileForm(instance=user, initial={
+            'username': user.username,
+            'firstname': user.first_name,
+            'lastname': user.last_name,
+            'email': user.email,
+            'phone': user.phone,
+            'address': user.address,
+            'picture': user.get_picture,
+        })
+    context = {
+        'form': form,
+        'user': user,
+        }
+    return render(request, 'registration/edit_staff.html', context)
 
 
 @login_required
@@ -543,11 +621,12 @@ def StudentAddView(request):
         try:
             csv_file = request.FILES['file']
         except MultiValueDictKeyError:
-            messages.error(request, "Error!!!:  Sorry, you need to upload a file!")
+            messages.error(
+                request, "Error!!!:  Sorry, you need to upload a file!")
             return redirect('add_new_student')
 
         if not csv_file.name.endswith('.csv'):
-            messages.error(request,"This is not a CSV file")
+            messages.error(request, "This is not a CSV file")
             return redirect('add_new_student')
         data_set = csv_file.read().decode('UTF-8')
         io_string = io.StringIO(data_set)
@@ -590,6 +669,7 @@ def StudentAddView(request):
             return redirect('add_new_student')
         return redirect('student_list')
 
+
 def student_reg_sms(id_number, pwd):
     """
     Twilio Task to send login details to student's phone number upon student 
@@ -606,6 +686,7 @@ def student_reg_sms(id_number, pwd):
             to=student.user.phone
         )
     return message
+
 
 def staff_reg_sms(username, pwd):
     """
@@ -624,18 +705,44 @@ def staff_reg_sms(username, pwd):
         )
     return message
 
+
 @login_required
 @admin_required
 def edit_student(request, pk):
     student = get_object_or_404(Student, pk=pk)
+    user = get_object_or_404(User, pk=student.user.pk)
     if request.method == "POST":
-        form = StudentAddForm(request.POST, instance=student)
+        form = ProfileForm(request.POST or None, request.FILES or None, instance=user)
         if form.is_valid():
-            form.save()
+            user.username = form.cleaned_data.get('username')
+            user.first_name = form.cleaned_data.get('firstname')
+            user.last_name = form.cleaned_data.get('lastname')
+            user.email = form.cleaned_data.get('email')
+            user.phone = form.cleaned_data.get('phone')
+            user.address = form.cleaned_data.get('address')
+            if request.FILES:
+                user.picture = request.FILES['picture']
+            user.save()
             return redirect('student_list')
     else:
-        form = StudentAddForm(instance=student)
-    return render(request, 'registration/edit_student.html', {'form': form})
+        form = ProfileForm(instance=user, initial={
+            'username': student.user.username,
+            'firstname': student.user.first_name,
+            'lastname': student.user.last_name,
+            'faculty': student.faculty,
+            'department': student.department,
+            'level': student.level,
+            'email': student.user.email,
+            'address': student.user.address,
+            'picture': student.user.get_picture,
+            'matric': student.id_number
+        })
+    context = {
+        'form': form,
+        'user': user,
+        'student': student,
+        }
+    return render(request, 'registration/edit_student.html', context)
 
 
 @login_required
@@ -700,7 +807,7 @@ def course_edit(request, pk):
             return redirect('course_list')
     else:
         form = CourseAddForm(instance=course)
-    return render(request, 'course/course_form.html', {'form': form})
+    return render(request, 'course/course_edit.html', {'form': form})
 
 
 @method_decorator([login_required, admin_required], name='dispatch')
@@ -743,7 +850,8 @@ def course_allocation_upload(request):
         try:
             csv_file = request.FILES['file']
         except MultiValueDictKeyError:
-            messages.error(request, "Error!!!:  Sorry, you need to upload a file!")
+            messages.error(
+                request, "Error!!!:  Sorry, you need to upload a file!")
             return redirect('course_allocation_upload')
 
         if not csv_file.name.endswith('.csv'):
@@ -761,12 +869,13 @@ def course_allocation_upload(request):
                 except:
                     allocations = CourseAllocation.objects.create(
                         lecturer=User.objects.get(username=column[0]))
-                allocations.courses.add(Course.objects.get(courseCode=column[1]))
+                allocations.courses.add(
+                    Course.objects.get(courseCode=column[1]))
                 allocations.save()
             context = {}
             return redirect('course_allocation_view')
         except IndexError:
-        # TODO : catch other Possible Exceptions: IndexError, Integrity Error
+            # TODO : catch other Possible Exceptions: IndexError, Integrity Error
             messages.error(request, "Error!!!:  Your CSV files is incomplete")
             return redirect('course_allocation_upload')
         except IntegrityError:
@@ -1103,8 +1212,8 @@ def add_score(request):
     if request.user.is_lecturer:
         current_session = Session.objects.get(is_current_session=True)
         current_semester = get_object_or_404(Semester,
-                                            is_current_semester=True,
-                                            session=current_session)
+                                             is_current_semester=True,
+                                             session=current_session)
         semester = Course.objects.filter(
             allocated_course__lecturer__pk=request.user.id,
             semester=current_semester)
@@ -1123,7 +1232,6 @@ def add_score(request):
         return render(request, 'result/add_score.html', context)
     else:
         return redirect('home')
-
 
 
 @login_required
@@ -1169,14 +1277,15 @@ def add_score_for(request, id):
             try:
                 csv_file = request.FILES['file']
             except MultiValueDictKeyError:
-                messages.error(request, "Error!!!:  Sorry, you need to upload a file!")
+                messages.error(
+                    request, "Error!!!:  Sorry, you need to upload a file!")
                 return redirect('add_score_for', id=id)
             if not csv_file.name.endswith('.csv'):
                 messages.error(request, "You just uploaded a wrong file")
                 return redirect('add_score_for', id=id)
             data_set = csv_file.read().decode('UTF-8')
             io_string = io.StringIO(data_set)
-            if request.user.is_lecturer: 
+            if request.user.is_lecturer:
                 for skip in range(11):
                     next(io_string)
                 try:
@@ -1191,8 +1300,9 @@ def add_score_for(request, id):
                         except:
                             continue
                 except IndexError:
-                # TODO : catch other Possible Exceptions: IndexError, Integrity Error
-                    messages.error(request, "Error!!!:  Your CSV files is incomplete")
+                    # TODO : catch other Possible Exceptions: IndexError, Integrity Error
+                    messages.error(
+                        request, "Error!!!:  Your CSV files is incomplete")
                     return redirect('add_score_for,', id=id)
             else:
                 try:
@@ -1207,8 +1317,9 @@ def add_score_for(request, id):
                         cas = cas + (column[9],)
                         exams = exams + (column[16],)
                 except IndexError:
-                # TODO : catch other Possible Exceptions: IndexError, Integrity Error
-                    messages.error(request, "Error!!!:  Your CSV files is incomplete")
+                    # TODO : catch other Possible Exceptions: IndexError, Integrity Error
+                    messages.error(
+                        request, "Error!!!:  Your CSV files is incomplete")
                     return redirect('add_score_for', id=id)
             for s in range(0, len(ids)):
                 try:
@@ -1228,7 +1339,7 @@ def add_score_for(request, id):
                 else:
                     courses = TakenCourse.objects.filter(
                         student__id_number=ids[s], course__semester=student.course.semester)
-    
+
                 total_unit_in_semester = 0
                 for i in courses:
                     if i == courses.count():
@@ -1237,7 +1348,8 @@ def add_score_for(request, id):
                         total_unit_in_semester += int(i.course.courseUnit)
                 student.ca = cas[s]
                 student.exam = exams[s]
-                student.total = student.get_total(ca=student.ca, exam=student.exam)
+                student.total = student.get_total(
+                    ca=student.ca, exam=student.exam)
                 if student.student.department == 'NURSING' and not student.course.courseCode.startswith('GES'):
                     student.grade = student.get_nursing_grade(
                         ca=student.ca, exam=student.exam)
@@ -1252,39 +1364,40 @@ def add_score_for(request, id):
                     gpa = student.calculate_gpa(total_unit_in_semester)
                     cgpa = student.calculate_cgpa()
                 else:
-                    gpa = student.calculate_gpa_old_students(total_unit_in_semester)
+                    gpa = student.calculate_gpa_old_students(
+                        total_unit_in_semester)
                     cgpa = student.calculate_cgpa_old_students()
-    
+
                 try:
                     if request.user.is_lecturer:
                         a = Result.objects.get(student=student.student,
-                                           semester=current_semester,
-                                           level=student.student.level)
+                                               semester=current_semester,
+                                               level=student.student.level)
                     else:
                         a = Result.objects.get(student=student.student,
-                                           semester=student.course.semester,
-                                           level=student.course.level)
+                                               semester=student.course.semester,
+                                               level=student.course.level)
                     a.gpa = gpa
                     a.cgpa = cgpa
                     a.save()
                 except:
                     if request.user.is_lecturer:
                         Result.objects.create(student=student.student,
-                                                     semester=current_semester,
-                                                     level=student.student.level,
-                                                     gpa=gpa,
-                                                     cgpa=cgpa,
-                                                     session=current_semester.session)
+                                              semester=current_semester,
+                                              level=student.student.level,
+                                              gpa=gpa,
+                                              cgpa=cgpa,
+                                              session=current_semester.session)
                     else:
                         Result.objects.create(student=student.student,
-                             semester=student.course.semester,
-                             level=student.course.level,
-                             gpa=gpa,
-                             cgpa=cgpa,
-                             session=sessh)
+                                              semester=student.course.semester,
+                                              level=student.course.level,
+                                              gpa=gpa,
+                                              cgpa=cgpa,
+                                              session=sessh)
                 messages.success(request, 'Successfully Uploaded and Recorded')
             return redirect('add_score')
-    
+
 
 @login_required
 @lecturer_required
@@ -1339,11 +1452,6 @@ def scoresheet_download(request, id):
     writer.writerows(footer)
     return response
 
-@login_required
-@admin_required
-def result(request):
-    w, created = ResultRender.objects.get_or_create(id=1)
-    return render(request, 'result/result.html', {'result_render': w})
 
 @login_required
 @admin_required
@@ -1352,6 +1460,7 @@ def toggles(request):
     w.toggle = request.POST['toggle'] == 'true'
     w.save()
     return HttpResponse('success')
+
 
 @login_required
 @admin_required
@@ -1367,11 +1476,12 @@ def mastersheet(request):
         if form.is_valid():
             dept = str(form.data.get('department'))
             level = int(form.data.get('level'))
-            tkc = TakenCourse.objects.filter(course__semester=cs, student__department=dept, student__level=level)
+            tkc = TakenCourse.objects.filter(
+                course__semester=cs, student__department=dept, student__level=level)
             students = set()
             courses = set()
             for c in tkc:
-               courses.add(c.course.courseCode)
+                courses.add(c.course.courseCode)
             courses = list(courses)
             coursesObj = Course.objects.filter(courseCode__in=courses)
             for i in coursesObj:
@@ -1381,45 +1491,50 @@ def mastersheet(request):
             students = list(students)
             studentsObj = Student.objects.filter(id_number__in=students)
             for i in studentsObj:
-                faculty=i.faculty
+                faculty = i.faculty
                 break
-            res = Result.objects.filter(semester=cs, session=current_session, student__id_number__in=students, level=level, student__department=dept)
-            oc = CarryOverStudent.objects.filter(student__id_number__in=students, course__courseCode__in=courses)
+            res = Result.objects.filter(semester=cs, session=current_session,
+                                        student__id_number__in=students, level=level, student__department=dept)
+            oc = CarryOverStudent.objects.filter(
+                student__id_number__in=students, course__courseCode__in=courses)
             tkcs = None
             total = None
             scores = {}
             for i in range(0, len(students)):
                 for j in range(0, len(courses)):
-                    tkcs = TakenCourse.objects.filter(student__id_number=students[i], course__courseCode=courses[j])
+                    tkcs = TakenCourse.objects.filter(
+                        student__id_number=students[i], course__courseCode=courses[j])
             for i in studentsObj:
                 d = {i.id_number: []}
                 scores.update(d)
             for i in scores:
                 for c in coursesObj:
-                    cc = TakenCourse.objects.get(student__id_number=i, course__courseCode=c.courseCode)
+                    cc = TakenCourse.objects.get(
+                        student__id_number=i, course__courseCode=c.courseCode)
                     scores[i].append(cc.total)
             print(scores)
             html = render_to_string(
-                        'result/mastersheetprint.html', {
-                        "cs": cs,
-                        "oc": oc,
-                        'res': res,
-                        "TCU": TCU,
-                        "current_session": current_session,
-                        "faculty": faculty,
-                        "dept": dept,
-                        "level": level,
-                        "tkc": tkc,
-                        "tkcs": tkcs,
-                        "studentsObj": studentsObj,
-                        "coursesObj": coursesObj,
-                        "scores": scores,
-                    })
+                'result/mastersheetprint.html', {
+                    "cs": cs,
+                    "oc": oc,
+                    'res': res,
+                    "TCU": TCU,
+                    "current_session": current_session,
+                    "faculty": faculty,
+                    "dept": dept,
+                    "level": level,
+                    "tkc": tkc,
+                    "tkcs": tkcs,
+                    "studentsObj": studentsObj,
+                    "coursesObj": coursesObj,
+                    "scores": scores,
+                })
             response = HttpResponse(content_type='application/pdf')
             response['Content-Disposition'] = f'attachment; filename="{dept}_{level}Level_mastersheet.pdf"'
             weasyprint.HTML(string=html, base_url=request.build_absolute_uri()).write_pdf(response,
-                stylesheets=[weasyprint.CSS(settings.STATIC_ROOT + '/assets/css/mastersheetpdf.css')]
-                )
+                                                                                          stylesheets=[weasyprint.CSS(
+                                                                                              settings.STATIC_ROOT + '/assets/css/mastersheetpdf.css')]
+                                                                                          )
             return response
     else:
         form = DepartmentLevelForm()

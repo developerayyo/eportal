@@ -7,15 +7,12 @@
 {% endblock side_bar %}
 
 {% block content %}
-<div class="container-fluid mt-5">
 
 	<!-- Editable table -->
 	<div class="card">
 	<h6 class="card-header text-center font-weight-bold text-uppercase py-4">{{ current_semester }} Semester - {{ current_session }}</h6>
 		<div class="container">
 		  <div class="row">
-		    <div class="col-md-5"><button type="button" class="btn btn-default w-25 p-3 disabled float-left">Save</button></div>
-		    <div class="col-md-3"><i data-toggle="tooltip" title="click on the dropdown button to select a course">No course selected</i></div>
 		    <div class="col-md-4">
 		    	<div class="dropdown">
 	    			<button class="btn btn-primary dropdown-toggle float-right" type="button" id="dropdownMenu3" 		data-toggle="dropdown"
@@ -37,5 +34,4 @@
 				</div>
 			</div>
 		  </div>
-		</div>
 {% endblock %}
