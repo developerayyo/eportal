@@ -21,6 +21,10 @@ ADMINS = [('Peter B', 'server-admin@eportalproject.ml'),]
 
 ALLOWED_HOSTS = ['aueportal.herokuapp.com', 'eportalproject.ml']
 
+INSTALLED_APPS.insert(6, 'whitenoise.runserver_nostatic')
+
+MIDDLEWARE.insert(1, 'whitenoise.middleware.WhiteNoiseMiddleware')
+
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
@@ -44,6 +48,11 @@ CELERY_ACCEPT_CONTENT=['application/json']
 CELERY_TASK_SERIALIZER='json'
 CELERY_RESULT_SERIALIZER='json'
 CELERY_TIMEZONE='Africa/Nairobi'
+
+# Simplified static file serving.
+# https://warehouse.python.org/project/whitenoise/
+
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 # Activate Django-Heroku.
 django_heroku.settings(locals())
