@@ -17,7 +17,7 @@ sentry_sdk.init(
 DEBUG = False
 ADMINS = [('Peter B', 'server-admin@eportalproject.ml'),]
 
-ALLOWED_HOSTS = ['app.eportalproject.ml']
+ALLOWED_HOSTS = ['*']
 
 DATABASES = {
      'default': {

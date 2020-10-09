@@ -19,7 +19,7 @@ DEBUG = config('DEBUG', cast=bool)
 
 ADMINS = [('Peter B', 'server-admin@eportalproject.ml'),]
 
-ALLOWED_HOSTS = ['aueportal.herokuapp.com', 'eportalproject.ml']
+ALLOWED_HOSTS = ['*']
 
 INSTALLED_APPS.insert(6, 'whitenoise.runserver_nostatic')
 
