@@ -111,11 +111,8 @@ var table = $('#datatables').DataTable({
 
     responsive: true,
     "processing": true,
-    "ajax": {
-        "processing": true,
-        "url": "/api/semesters/",
-        "dataSrc": ""
-    },
+    "serverSide": true,
+    "ajax": "/api/semesters/?format=datatables",
 
     'columns': [
       {

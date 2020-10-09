@@ -111,11 +111,12 @@ var table = $('#datatables').DataTable({
 
     responsive: true,
     "processing": true,
-    "ajax": {
-        "processing": true,
+    "serverSide": true,
+    "ajax": "/api/courseallocation/?format=datatables",
+    {% comment %} "ajax": {
         "url": "/api/courseallocation/",
         "dataSrc": ""
-    },
+    }, {% endcomment %}
 
     'columns': [
       {
@@ -126,7 +127,11 @@ var table = $('#datatables').DataTable({
     },
 
       {'data': 'lecturer.username'},
-      {'data': 'lecturer.get_full_name'},
+      {"data": "lecturer.first_name",
+       "render": function ( data, type, row ) {
+          return row.lecturer.first_name + ' ' + row.lecturer.last_name;
+        }
+      },
       {
             "data": 'courses',
             "render": function(data, type, row){

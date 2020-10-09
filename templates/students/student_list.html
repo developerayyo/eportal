@@ -113,11 +113,8 @@ var table = $('#datatables').DataTable({
 
     responsive: true,
     "processing": true,
-    "ajax": {
-        "processing": true,
-        "url": "/api/students/",
-        "dataSrc": ""
-    },
+    "serverSide": true,
+    "ajax": "/api/students/?format=datatables",
 
     'columns': [
       {
@@ -128,7 +125,11 @@ var table = $('#datatables').DataTable({
     },
 
       {'data': 'id_number'},
-      {'data': 'user.get_full_name'},
+      {"data": "user.first_name",
+       "render": function ( data, type, row ) {
+          return row.user.first_name + ' ' + row.user.last_name;
+      }
+      },
       {'data': 'level'},
       {'data': 'faculty'},
       {'data': 'department'},

@@ -130,7 +130,7 @@ class User(AbstractUser):
     username_validator = ASCIIUsernameValidator()
 
     def get_picture(self):
-        no_picture = settings.STATIC_URL + 'img/img_avatar.png'
+        no_picture = settings.STATIC_URL + 'assets/img/img_avatar.png'
         try:
             return self.picture.url
         except:

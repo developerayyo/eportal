@@ -110,11 +110,8 @@ var table = $('#datatables').DataTable({
 
     responsive: true,
     "processing": true,
-    "ajax": {
-        "processing": true,
-        "url": "/api/sessions/",
-        "dataSrc": ""
-    },
+    "serverSide": true,
+    "ajax": "/api/sessions/?format=datatables",
 
     'columns': [
       {

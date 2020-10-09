@@ -112,12 +112,8 @@ var table = $('#datatables').DataTable({
 
     responsive: true,
     "processing": true,
-    "ajax": {
-        "processing": true,
-        "url": "/api/lecturers/",
-        "dataSrc": ""
-    },
-
+    "serverSide": true,
+    "ajax": "/api/lecturers/?format=datatables",
     'columns': [
       {
       "data": "id",
@@ -127,7 +123,7 @@ var table = $('#datatables').DataTable({
     },
 
       {'data': 'username'},
-      {'data': 'get_full_name'},
+      {"data": "first_name"},
       {'data': 'phone'},
       {'data': 'address'},
       {

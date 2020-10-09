@@ -113,11 +113,13 @@ var table = $('#datatables').DataTable({
 
     responsive: true,
     "processing": true,
+    "serverSide": true,
+    "ajax": "/api/courses/?format=datatables",
+    {% comment %} "processing": true,
     "ajax": {
-        "processing": true,
         "url": "/api/courses/",
         "dataSrc": ""
-    },
+    }, {% endcomment %}
 
     'columns': [
       {
