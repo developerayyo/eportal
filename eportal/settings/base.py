@@ -34,12 +34,14 @@ INSTALLED_APPS = [
     'widget_tweaks',
     'crispy_forms',
     'import_export',
+    'corsheaders',
     'rest_framework',
     'coverage',
     'rest_framework_datatables',
 ]
 
 MIDDLEWARE = [
+    'corsheaders.middleware.CorsMiddleware',
     'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -152,3 +154,5 @@ REST_FRAMEWORK = {
 }
 
 IMPORT_EXPORT_USE_TRANSACTIONS = True
+
+CORS_ORIGIN_ALLOW_ALL = True
