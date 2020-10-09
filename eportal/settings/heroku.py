@@ -19,7 +19,7 @@ DEBUG = config('DEBUG', cast=bool)
 
 ADMINS = [('Peter B', 'server-admin@eportalproject.ml'),]
 
-ALLOWED_HOSTS = ['*']
+ALLOWED_HOSTS = ['aueportal.herokuapp.com', 'eportalproject.ml']
 
 DATABASES = {
     'default': {

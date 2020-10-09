@@ -17,7 +17,7 @@ sentry_sdk.init(
 DEBUG = False
 ADMINS = [('Peter B', 'server-admin@eportalproject.ml'),]
 
-ALLOWED_HOSTS = ['*']
+ALLOWED_HOSTS = ['app.eportalproject.ml']
 
 DATABASES = {
      'default': {
@@ -40,8 +40,8 @@ SECURE_HSTS_SECONDS = 3600
 SECURE_HSTS_INCLUDE_SUBDOMAINS = True
 
 # CELERY STUFF
-BROKER_URL='redis://eportalproject.ml:6379'
-CELERY_RESULT_BACKEND='redis://eportalproject.ml:6379'
+BROKER_URL='redis://app.eportalproject.ml:6379'
+CELERY_RESULT_BACKEND='redis://app.eportalproject.ml:6379'
 CELERY_ACCEPT_CONTENT=['application/json']
 CELERY_TASK_SERIALIZER='json'
 CELERY_RESULT_SERIALIZER='json'
