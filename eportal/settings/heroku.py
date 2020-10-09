@@ -14,7 +14,7 @@ sentry_sdk.init(
 )
 
 
-DEBUG = False
+DEBUG = True
 ADMINS = [('Peter B', 'server-admin@eportalproject.ml'),]
 
 ALLOWED_HOSTS = ['*']
