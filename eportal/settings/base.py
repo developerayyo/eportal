@@ -122,28 +122,6 @@ STATICFILES_DIRS = [
     os.path.join(BASE_DIR, 'portal/static'),
 ] 
 
-USE_AWS = False
-
-if USE_AWS:
-    # s3 static settings
-    STATIC_LOCATION = 'static'
-    STATIC_URL = f'https://{AWS_S3_CUSTOM_DOMAIN}/{STATIC_LOCATION}/'
-    STATICFILES_STORAGE = 'eportal.storage_backends.StaticStorage'
-
-    # s3 public media settings
-    PUBLIC_MEDIA_LOCATION = 'media'
-    MEDIA_URL = f'https://{AWS_S3_CUSTOM_DOMAIN}/{PUBLIC_MEDIA_LOCATION}/'
-    DEFAULT_FILE_STORAGE = 'eportal.storage_backends.PublicMediaStorage'
-
-    ADMIN_MEDIA_PREFIX = STATIC_URL + 'admin/'
-else:
-    # local static settings 
-    STATIC_URL = '/static/'
-    STATIC_ROOT = os.path.join(BASE_DIR, 'static')
-
-    # local media settings
-    MEDIA_URL = '/media/'
-    MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 TEMPLATES[0]['OPTIONS']['context_processors'].append(
     "portal.context_processors.semester_processor")

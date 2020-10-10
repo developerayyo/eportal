@@ -16,8 +16,6 @@ sentry_sdk.init(
 
 DEBUG = False
 
-USE_AWS = True
-
 ADMINS = [('Peter B', 'server-admin@eportalproject.ml'),]
 
 ALLOWED_HOSTS = config('EC2_HOSTS', cast=Csv())
@@ -34,6 +32,17 @@ DATABASES = {
  }
 
 SERVER_EMAIL = "server@eportalproject.ml"
+
+# s3 static settings
+STATIC_LOCATION = 'static'
+STATIC_URL = f'https://{AWS_S3_CUSTOM_DOMAIN}/{STATIC_LOCATION}/'
+STATICFILES_STORAGE = 'eportal.storage_backends.StaticStorage'
+# s3 public media settings
+PUBLIC_MEDIA_LOCATION = 'media'
+MEDIA_URL = f'https://{AWS_S3_CUSTOM_DOMAIN}/{PUBLIC_MEDIA_LOCATION}/'
+DEFAULT_FILE_STORAGE = 'eportal.storage_backends.PublicMediaStorage'
+ADMIN_MEDIA_PREFIX = STATIC_URL + 'admin/'
+
 
 SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
 SECURE_SSL_REDIRECT = True
