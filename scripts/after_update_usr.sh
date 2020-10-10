@@ -14,4 +14,4 @@ command cd /home/ubuntu/eportal
 command python3 manage.py makemigrations --settings=eportal.settings.pro
 command python3 manage.py migrate --settings=eportal.settings.pro
 # command python3 manage.py loaddata dbback3.json --settings=eportal.settings.pro
-command python3 manage.py collectstatic --settings=eportal.settings.pro
+command python3 manage.py collectstatic --noinput --settings=eportal.settings.pro
