@@ -15,15 +15,11 @@ sentry_sdk.init(
 
 
 DEBUG = config('DEBUG', cast=bool)
-
+USE_AWS = True
 
 ADMINS = [('Peter B', 'server-admin@eportalproject.ml'),]
 
-ALLOWED_HOSTS = ['*']
-
-INSTALLED_APPS.insert(6, 'whitenoise.runserver_nostatic')
-
-MIDDLEWARE.insert(1, 'whitenoise.middleware.WhiteNoiseMiddleware')
+ALLOWED_HOSTS = config('HEROKU_HOSTS', cast=Csv())
 
 DATABASES = {
     'default': {
@@ -40,19 +36,6 @@ SESSION_COOKIE_SECURE = True
 CSRF_COOKIE_SECURE = True
 SECURE_HSTS_SECONDS = 3600
 SECURE_HSTS_INCLUDE_SUBDOMAINS = True
-
-# CELERY STUFF
-BROKER_URL='redis://eportalproject.ml:6379'
-CELERY_RESULT_BACKEND='redis://eportalproject.ml:6379'
-CELERY_ACCEPT_CONTENT=['application/json']
-CELERY_TASK_SERIALIZER='json'
-CELERY_RESULT_SERIALIZER='json'
-CELERY_TIMEZONE='Africa/Nairobi'
-
-# Simplified static file serving.
-# https://warehouse.python.org/project/whitenoise/
-
-STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 # Activate Django-Heroku.
 django_heroku.settings(locals())

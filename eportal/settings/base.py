@@ -14,7 +14,18 @@ https://docs.djangoproject.com/en/2.1/ref/settings/
 import os
 import django_heroku
 import dj_database_url
-from decouple import config
+from decouple import config, Csv
+
+
+AWS_ACCESS_KEY_ID = config('AWS_ACCESS_KEY_ID') 
+AWS_SECRET_ACCESS_KEY = config('AWS_SECRET_ACCESS_KEY')
+AWS_STORAGE_BUCKET_NAME = config('AWS_STORAGE_BUCKET_NAME')
+AWS_S3_CUSTOM_DOMAIN='%s.s3.amazonaws.com' % AWS_STORAGE_BUCKET_NAME
+AWS_S3_OBJECT_PARAMETERS = {    
+     'CacheControl': 'max-age=86400',
+}
+AWS_DEFAULT_ACL = 'None'
+
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(
     os.path.join(__file__, os.pardir))))
@@ -24,13 +35,13 @@ SECRET_KEY = config('SECRET_KEY')
 ALLOWED_HOSTS = ['*']
 
 INSTALLED_APPS = [
-    'portal',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'portal',
     'django.contrib.humanize',
     'widget_tweaks',
     'crispy_forms',
@@ -39,6 +50,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'coverage',
     'rest_framework_datatables',
+    'storages',
 ]
 
 MIDDLEWARE = [
@@ -101,18 +113,37 @@ USE_L10N = True
 
 USE_TZ = True
 
-STATIC_URL = '/static/'
-STATIC_ROOT = os.path.join(BASE_DIR, 'static')
-
 
 AUTH_USER_MODEL = 'portal.User'
-
 LOGIN_REDIRECT_URL = '/'
-
 LOGOUT_REDIRECT_URL = '/'
 
-MEDIA_URL = '/media/'
-MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+STATICFILES_DIRS = [
+    os.path.join(BASE_DIR, 'portal/static'),
+] 
+
+USE_AWS = False
+
+if USE_AWS:
+    # s3 static settings
+    STATIC_LOCATION = 'static'
+    STATIC_URL = f'https://{AWS_S3_CUSTOM_DOMAIN}/{STATIC_LOCATION}/'
+    STATICFILES_STORAGE = 'eportal.settings.storage_backends.StaticStorage'
+
+    # s3 public media settings
+    PUBLIC_MEDIA_LOCATION = 'media'
+    MEDIA_URL = f'https://{AWS_S3_CUSTOM_DOMAIN}/{PUBLIC_MEDIA_LOCATION}/'
+    DEFAULT_FILE_STORAGE = 'eportal.settings.storage_backends.PublicMediaStorage'
+
+    ADMIN_MEDIA_PREFIX = STATIC_URL + 'admin/'
+else:
+    # local static settings 
+    STATIC_URL = '/static/'
+    STATIC_ROOT = os.path.join(BASE_DIR, 'static')
+
+    # local media settings
+    MEDIA_URL = '/media/'
+    MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 TEMPLATES[0]['OPTIONS']['context_processors'].append(
     "portal.context_processors.semester_processor")
