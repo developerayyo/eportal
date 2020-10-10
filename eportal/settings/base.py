@@ -17,8 +17,8 @@ import dj_database_url
 from decouple import config, Csv
 
 
-AWS_ACCESS_KEY_ID = config('AWS_ACCESS_KEY_ID') 
-AWS_SECRET_ACCESS_KEY = config('AWS_SECRET_ACCESS_KEY')
+AWS_ACCESS_KEY_ID = config('AWS_ACCESS_KEY_ID2') 
+AWS_SECRET_ACCESS_KEY = config('AWS_SECRET_ACCESS_KEY2')
 AWS_STORAGE_BUCKET_NAME = config('AWS_STORAGE_BUCKET_NAME')
 AWS_S3_CUSTOM_DOMAIN='%s.s3.amazonaws.com' % AWS_STORAGE_BUCKET_NAME
 AWS_S3_OBJECT_PARAMETERS = {    
@@ -128,12 +128,12 @@ if USE_AWS:
     # s3 static settings
     STATIC_LOCATION = 'static'
     STATIC_URL = f'https://{AWS_S3_CUSTOM_DOMAIN}/{STATIC_LOCATION}/'
-    STATICFILES_STORAGE = 'eportal.settings.storage_backends.StaticStorage'
+    STATICFILES_STORAGE = 'eportal.storage_backends.StaticStorage'
 
     # s3 public media settings
     PUBLIC_MEDIA_LOCATION = 'media'
     MEDIA_URL = f'https://{AWS_S3_CUSTOM_DOMAIN}/{PUBLIC_MEDIA_LOCATION}/'
-    DEFAULT_FILE_STORAGE = 'eportal.settings.storage_backends.PublicMediaStorage'
+    DEFAULT_FILE_STORAGE = 'eportal.storage_backends.PublicMediaStorage'
 
     ADMIN_MEDIA_PREFIX = STATIC_URL + 'admin/'
 else:

@@ -15,6 +15,7 @@ sentry_sdk.init(
 
 
 DEBUG = config('DEBUG', cast=bool)
+
 USE_AWS = True
 
 ADMINS = [('Peter B', 'server-admin@eportalproject.ml'),]
