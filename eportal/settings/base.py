@@ -120,7 +120,7 @@ LOGOUT_REDIRECT_URL = '/'
 
 STATICFILES_DIRS = [
     os.path.join(BASE_DIR, 'portal/static'),
-] 
+]
 
 
 TEMPLATES[0]['OPTIONS']['context_processors'].append(
