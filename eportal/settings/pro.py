@@ -18,7 +18,7 @@ DEBUG = False
 
 ADMINS = [('Peter B', 'server-admin@eportalproject.ml'),]
 
-ALLOWED_HOSTS = config('EC2_HOSTS', cast=Csv())
+ALLOWED_HOSTS = ['*']
 
 DATABASES = {
      'default': {
