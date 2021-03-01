@@ -21,3 +21,4 @@ static/
 runserver.sh
 settings.ini
 media/
+venv/
