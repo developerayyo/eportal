@@ -1,0 +1,14 @@
+# created by virtualenv automatically
+.idea/
+venv/
+.env
+.vscode/
+eportal/__pycache__/
+docs/_build/
+docs/_static/
+docs/_templates/
+.cc_token
+.coverage
+settings.ini
+media/
+db.sqlite3

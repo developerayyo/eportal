@@ -1,0 +1,58 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load humanize %}
+
+{% block title %}ACRRPS | Registered Courses{% endblock title %}
+
+{% load crispy_forms_tags %}
+
+{% block side_bar %}
+    {% include 'partial_active_element.html' with active='registered_courses' %}
+{% endblock side_bar %}
+
+{% block content %}
+<style type="text/css">
+  .table-wrapper-scroll-y {
+display: block;
+max-height: 350px;
+overflow-y: auto;
+-ms-overflow-style: -ms-autohiding-scrollbar;
+}
+</style>
+<div class="container-fluid mt-5">
+<div class="col-md-8 text-center">
+      <p>Registered Courses</p>
+  <div class="table-wrapper-scroll-y">
+
+  <table class="table table-bordered table-striped">
+  <thead>
+    <tr>
+      <th scope="col">#</th>
+      <th scope="col">Course Code</th>
+      <th scope="col">Course Title</th>
+      <th scope="col">Course Unit</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for course in courses %}
+    <tr>
+      <th scope="row">{{ forloop.counter }}</th>
+      <td>{{ course.course.courseCode }}</td>
+      <td>{{ course.course.courseTitle }}</td>
+      <td>{{ course.course.courseUnit }}</td>
+    </tr>
+    {% empty %}
+    <tr>
+    <td>{{ course.courseCode }}</td>
+      <td></td>
+      <td>No course is registered this semester !</td>
+      <td></td>
+    </tr>
+  {% endfor %}
+  </tbody>
+</table>
+    </div>
+</div>
+</div>
+{% endblock %}
+

@@ -1,0 +1,265 @@
+ {% extends 'base.html' %}
+ {% load humanize %}
+{% block title %} ACRRPS | Dashboard {% endblock title %}
+
+{% block content %}
+
+<!-- Modal -->
+<form>
+  <div class="modal fade" id="show_semester_modal">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <p class="modal-title">Switch Semester!!</p>
+          <button class="close" data-dismiss="modal">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+            <label for="user">Semester:</label>
+            <input type="text" class="form-control" placeholder="enter semester" id="user">
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-info">Switch</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</form>
+<form role="form" class="form-horizontal" method="post" action="" enctype="multipart/form-data">{% csrf_token %}
+  <div class="modal fade" id="show_session_modal">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <p class="modal-title">Switch Session!!</p>
+          <button class="close" data-dismiss="modal">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+        {% for field in form.visible_fields %}
+        <label for="{{ field.label }}" class="col-sm-2 control-label">{{ field.label }}</label>
+            {% comment %} <input type="text" class="form-control" placeholder="enter session" id="user"> {% endcomment %}
+        {{ field }}
+          {% if field.help_text %}
+            <span class="help-block">{{ field.help_text }}</span>
+          {% endif %}
+          {% for error in field.errors %}
+            <label class="control-label">{{ error }}</label>
+          {% endfor %}
+        </div>
+    {% endfor %}
+        <div class="modal-footer">
+          <button class="btn btn-info">Switch</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</form>
+
+
+{% if request.user.is_superuser %}
+<div class="row">
+    <div class="col-lg-4 col-md-12 col-sm-12">
+        <div class="card card-stats">
+          <div class="card-header card-header-rose card-header-icon">
+            <div class="card-icon">
+              <i class="material-icons">groups</i>
+            </div>
+            <p class="card-category"><a href="{% url 'student_list'%}" style="colol: inherit;">Student{{ no_of_students|pluralize }}</a></p>
+            <h3 class="card-title">{{ no_of_students|apnumber }} ({{ no_of_students }})</h3>
+          </div>
+          <div class="card-footer">
+            <div class="stats">
+              <i class="material-icons">local_offer</i> All active students.
+            </div>
+          </div>
+        </div>
+    </div>
+    <div class="col-lg-4 col-md-12 col-sm-12">
+        <div class="card card-stats">
+          <div class="card-header card-header-rose card-header-icon">
+            <div class="card-icon">
+              <i class="material-icons">supervisor_account</i>
+            </div>
+            <p class="card-category"><a href="{% url 'staff_list'%}" style="colol: inherit;">Staff{{ no_of_staff|pluralize }}</a></p>
+            <h3 class="card-title">{{ no_of_staff|apnumber }} ({{ no_of_staff }})</h3>
+          </div>
+          <div class="card-footer">
+            <div class="stats">
+              <i class="material-icons">local_offer</i> All active lecturers.
+            </div>
+          </div>
+        </div>
+    </div>
+    <div class="col-lg-4 col-md-12 col-sm-12">
+        <div class="card card-stats">
+          <div class="card-header card-header-rose card-header-icon">
+            <div class="card-icon">
+              <i class="material-icons">library_books</i>
+            </div>
+            <p class="card-category"><a href="{% url 'course_list'%}" style="colol: inherit;">Course{{ no_of_courses|pluralize }}</a></p>
+            <h3 class="card-title">{{ no_of_courses|apnumber }} ({{ no_of_courses }})</h3>
+          </div>
+          <div class="card-footer">
+            <div class="stats">
+              <i class="material-icons">local_offer</i>All available courses.
+            </div>
+          </div>
+        </div>
+    </div>
+    <div class="col-lg-5 col-md-10">
+        <canvas id="students_avg_bar" width="400" height="220"></canvas>
+    </div>
+    <div class="col-lg-7 col-md-10">
+        <canvas id="students_avg_doughnut" width="400" height="150"></canvas>
+    </div>
+</div>
+<hr />
+<div class="row">
+    <div class="col-lg-4 col-md-12 col-sm-12">
+        <div class="card card-stats">
+          <div class="card-header card-header-rose card-header-icon">
+            <div class="card-icon">
+              <i class="material-icons">library_books</i>
+            </div>
+            <p class="card-category"><a href="{% url 'repeat_list'%}" style="colol: inherit;">Repating Students{{ no_of_students_to_repeat|pluralize }}</a></p>
+            <h3 class="card-title">{{ no_of_students_to_repeat|apnumber }} ({{ no_of_students_to_repeat }})</h3>
+          </div>
+          <div class="card-footer">
+            <div class="stats">
+              <i class="material-icons">groups</i>All repeating students.
+            </div>
+          </div>
+        </div>
+    </div>
+    <div class="col-lg-4 col-md-12 col-sm-12">
+        <div class="card card-stats">
+          <div class="card-header card-header-rose card-header-icon">
+            <div class="card-icon">
+              <i class="material-icons">groups</i>
+            </div>
+            <p class="card-category"><a href="{% url 'carry_over'%}" style="colol: inherit;">Carry Over Students{{ no_of_carry_over_students|pluralize }}</a></p>
+            <h3 class="card-title">{{ no_of_carry_over_students|apnumber }} ({{ no_of_carry_over_students }})</h3>
+          </div>
+          <div class="card-footer">
+            <div class="stats">
+              <i class="material-icons">local_offer</i>All carry over students.
+            </div>
+          </div>
+        </div>
+    </div>
+    <div class="col-lg-4 col-md-12 col-sm-12">
+        <div class="card card-stats">
+          <div class="card-header card-header-rose card-header-icon">
+            <div class="card-icon">
+              <i class="material-icons">groups</i>
+            </div>
+            <p class="card-category"><a href="{% url 'first_class_list'%}" style="colol: inherit;">1st Class Students{{ no_of_1st_class_students|pluralize }}</a></p>
+            <h3 class="card-title">{{ no_of_1st_class_students|apnumber }} ({{ no_of_1st_class_students}})</h3>
+          </div>
+          <div class="card-footer">
+            <div class="stats">
+              <i class="material-icons">local_offer</i>All 1st class students.
+            </div>
+          </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+{% endblock %}
+{% block domready %}
+        var endpoint = 'api/data/'
+        var default_level_average = []
+        var labels = []
+        $.ajax({
+            method: "GET",
+            url: endpoint,
+            success: function(data) {
+                labels = data.labels
+                default_level_average = data.default_level_average
+                setAverageGraph()
+            },
+            error: function(error_data) {
+                console.log("error")
+                console.log(error_data)
+            },
+        })
+        function setAverageGraph(){
+        var ctx = document.getElementById("students_avg_bar").getContext('2d');
+        var ctx2 = document.getElementById("students_avg_doughnut").getContext('2d');
+        var myChart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: '# Based on students performance (Average)',
+                    data: default_level_average,
+                    backgroundColor: [
+                        'rgba(255, 99, 132, 0.2)',
+                        'rgba(54, 162, 235, 0.2)',
+                        'rgba(255, 206, 86, 0.2)',
+                        'rgba(75, 192, 192, 0.2)',
+                        'rgba(153, 102, 255, 0.2)',
+                        'rgba(255, 159, 64, 0.2)'
+                    ],
+                    borderColor: [
+                        'rgba(255,99,132,1)',
+                        'rgba(54, 162, 235, 1)',
+                        'rgba(255, 206, 86, 1)',
+                        'rgba(75, 192, 192, 1)',
+                        'rgba(153, 102, 255, 1)',
+                        'rgba(255, 159, 64, 1)'
+                    ],
+                    borderWidth: 1
+                    }]
+                },
+                options: {
+                    scales: {
+                        yAxes: [{
+                            ticks: {
+                                beginAtZero:true
+                            }
+                        }]
+                    }
+                }
+            });
+
+            var myChart = new Chart(ctx2, {
+            type: 'doughnut',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: '# Based on students performance (Average)',
+                    data: default_level_average,
+                    backgroundColor: [
+                        'rgba(255, 99, 132, 0.2)',
+                        'rgba(54, 162, 235, 0.2)',
+                        'rgba(255, 206, 86, 0.2)',
+                        'rgba(75, 192, 192, 0.2)',
+                        'rgba(153, 102, 255, 0.2)',
+                        'rgba(255, 159, 64, 0.2)'
+                    ],
+                    borderColor: [
+                        'rgba(255,99,132,1)',
+                        'rgba(54, 162, 235, 1)',
+                        'rgba(255, 206, 86, 1)',
+                        'rgba(75, 192, 192, 1)',
+                        'rgba(153, 102, 255, 1)',
+                        'rgba(255, 159, 64, 1)'
+                    ],
+                    borderWidth: 1
+                    }]
+                },
+                options: {
+                    scales: {
+                        yAxes: [{
+                            ticks: {
+                                beginAtZero:true
+                            }
+                        }]
+                    }
+                }
+            });
+        }
+{% endblock domready%}

@@ -1,0 +1,100 @@
+{% extends 'base.html' %}
+
+{% block title %}ACRRPS | Results{% endblock title %}
+
+{% block side_bar %}
+    {% include 'partial_active_element.html' with active='view_results' %}
+{% endblock side_bar %}
+
+{% block content %}
+	<div class="container-fluid mt-5">
+          {% if messages %}
+        {% for message in messages %}
+          <div class="alert alert-success alert-dismissable">
+            <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+            {{ message }}
+          </div>
+        {% endfor %}
+      {% endif %}
+<style type="text/css">
+  .table-wrapper-scroll-y {
+display: block;
+max-height: 350px;
+overflow-y: auto;
+-ms-overflow-style: -ms-autohiding-scrollbar;
+}
+</style>
+{% if w.toggle %}
+<div class="table-wrapper-scroll-y">
+  
+  <table class="table table-bordered table-striped">
+    <thead>
+      <tr>
+        <th scope="col">#</th>
+        <th scope="col">Course Title</th>
+        <th scope="col">Course Code</th>
+        <th scope="col">CA</th>
+        <th scope="col">Exam Score</th>
+        <th scope="col"> Total Score</th>
+        <th scope="col">Course Unit</th>
+        <th scope="col">GRADE</th>
+      </tr>
+    </thead>
+    <div class="view view-cascade gradient-card-header blue-gradient narrower py-2 mx-4 mb-3 d-flex justify-content-between align-items-center">
+      <u class="text-white">{{ current_semester }} Semester:</u>
+      <center class="white-text mx-3">{{ student.level }}L Result</center>
+
+      <a target="_blank" href="{% url 'result_pdf' %}" class="btn btn-outline-white btn-rounded btn-sm px-2 text-white">
+        <i class="fa fa-file-pdf-o" aria-hidden="true"></i> Print Result
+      </a>
+    </div>
+    {% for course in courses %}
+    <tbody>
+      <tr>
+        <th scope="row">{{ forloop.counter }}</th>
+        <td>{{ course.course.courseTitle }}</td>
+        <td>{{ course.course.courseCode }}</td>
+        <td>{{ course.ca }}</td>
+        <td>{{ course.exam }}</td>
+        <td>{{ course.total }}</td>
+        <td>{{ course.course.courseUnit }}</td>
+        <td>{{ course.grade }}</td>
+      </tr>
+    </tbody>
+    {% endfor %}
+    <br>
+  </table>
+</div>
+<br>
+<tbody>
+  {% for result in result %}
+  {% if result.semester == "First" and result.level == result.student.level %}
+  <tr>
+    <th scope="row"></th>
+    <th></th>
+    <th><label>{{ result.level }}L First Semester GPA:</label> {{ result.gpa }}</th>
+  </tr>
+  <br>
+  {% elif result.semester == "Second" and result.level == result.student.level %}
+    <tr>
+    <th scope="row"></th>
+    <th></th>
+    <th><label>{{ result.level }}L Second Semester GPA:</label> {{ result.gpa }}</th>
+  </tr>
+  <br>
+  {% endif %}
+  {% endfor %}
+  <tr>
+    <th scope="row"></th>
+    <th></th>
+    {% if currentCGPA %}
+      <th><label>CGPA:</label> {{ currentCGPA }}</th>
+    {% else %}
+       <th><label>CGPA:</label> Not ready yet!</th>
+    {% endif %}<br>
+  </tr>
+</tbody>
+{% endif %}
+</div>
+<br>
+{% endblock %}

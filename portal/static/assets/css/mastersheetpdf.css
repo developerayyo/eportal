@@ -1,0 +1,38 @@
+@page {
+  size: A4 landscape;
+  margin: 1cm;
+  bleed: 7pt;
+}
+
+.details {
+  margin-right: 5%;
+  margin-left: 4%;
+}
+#leads {
+  display: flex;
+  text-align: center;
+}
+.details3 {
+  font-size: larger;
+}
+
+.logo {
+  /* border: 1px solid black; */
+  width: 21.5%;
+  height: 150px;
+  margin-top: 20px;
+  margin-bottom: 20px;
+}
+
+th,
+td {
+  /* border: 1px solid black; */
+  /* padding: 10px 10px; */
+  text-align: center;
+}
+thead {
+  background-color: grey;
+}
+tr:nth-child(even) {
+  background-color: lightgray;
+}

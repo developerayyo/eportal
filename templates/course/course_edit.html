@@ -1,0 +1,88 @@
+{% extends 'base.html' %}
+{% load widget_tweaks %}
+
+{% load crispy_forms_tags %}
+{% block title %}ACRRPS | Edit Course{% endblock title %}
+
+{% block side_bar %}
+    {% include 'partial_active_element.html' with active='course_list' %}
+{% endblock side_bar %}
+
+{% block content %}
+  {% if messages %}
+        {% for message in messages %}
+          <div class="alert alert-success alert-dismissable">
+            <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+            {{ message }}
+          </div>
+        {% endfor %}
+      {% endif %}
+<div class="row">
+<div class="col-md-2"></div>
+  <div class="col-md-8">
+    <div class="card">
+      <div class="card-header card-header-icon card-header-rose">
+        <div class="card-icon">
+          <i class="material-icons">library_books</i>
+        </div>
+        <h4 class="card-title">Edit Course -
+          <small class="category">edit course details</small>
+        </h4>
+      </div>
+      <div class="card-body">
+        <form method="post">{% csrf_token %}
+          <div class="row">
+            <div class="col-md-5">
+              <div class="form-group">
+                <label class="bmd-label-floating ">{{form.courseCode.label}}</label>
+                {{form.courseCode}}
+                {{form.courseCode.errors}}
+              </div>
+            </div>
+            <div class="col-md-3">
+              <div class="form-group">
+                <label class="bmd-label-floating ">{{form.courseTitle.label}}</label>
+                {{form.courseTitle}}
+                {{form.courseTitle.errors}}
+              </div>
+            </div>
+            <div class="col-md-4">
+              <div class="form-group">
+                <label class="bmd-label-floating ">{{form.courseUnit.label}}</label>
+                {{form.courseUnit}}
+                {{form.courseUnit.errors}}
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="form-group">
+                <label class="bmd-label-floating ">{{form.semester.label}}</label>
+                {{form.semester}}
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="form-group">
+                <label class="bmd-label-floating ">{{form.level.label}}</label>
+                {{form.level}}
+              </div>
+            </div>
+            <div class="col-md-12">
+              <div class="form-group">
+                <label class="bmd-label-floating ">{{form.description.label}}</label>
+                {{form.description}}
+              </div>
+            </div>
+            <div class="col-md-12">
+              <div class="form-group">
+                <label class="bmd-label-floating ">{{form.is_elective.label}}</label>
+                {{form.is_elective}}
+              </div>
+            </div>
+          </div>
+          <button type="submit" class="btn btn-rose pull-right">Update Course</button>
+          <div class="clearfix"></div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

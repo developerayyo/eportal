@@ -1,0 +1,69 @@
+{% extends 'base.html' %}
+{% load humanize %}
+{% block title %}ACRRPS | Course Allocation{% endblock %}
+
+{% block side_bar %}
+    {% include 'partial_active_element.html' with active='course_allocation' %}
+{% endblock side_bar %}
+
+{% block content %}
+{% if messages %}
+  {% for message in messages %}
+    <div class="alert alert-danger animated fadeInDown" style="top: -12px;">
+      <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+        <i class="material-icons">close</i>
+      </button>
+      <span><b>{{ message }}</span>
+    </div>
+  {% endfor %}
+  {% endif %}
+<form method="post">{% csrf_token %}
+  <div class="row">
+      <div class="col-lg-3 col-md-3">
+      </div>
+      <div class="col-lg-6 col-md-6">
+        <div class="card">
+          <div class="card-header card-header-rose text-center">
+            <h4 class="card-title">Assign Courses</h4>
+          </div>
+          <div class="card-body">
+            <ul class="list-group">
+              <li class="list-group-item d-flex justify-content-between align-items-center">
+                {{ form.lecturer.label }}:
+                  <small>{{ form.lecturer }}</small>
+                  <span class="badge badge-primary badge-pill">
+                  {{ form.lecturer|length|add:-1 }}
+                  ({{ form.lecturer|length|add:-1|apnumber }})
+                  lecturer{{ form.lecturer|length|pluralize }} </span>
+                </li>
+                {% for course in form.courses %}
+                <li class="list-group-item d-flex justify-content-between align-items-center">
+                  <small class="text-muted">{{ course }}</small>
+                  <span class="badge badge-primary badge-pill fa fa-check"></span>
+                  {% empty %}
+                  <span class="badge badge-primary badge-pill">
+                    No Course Available
+                    <a href="{% url 'add_new_course' %}"><i style="color: #ffffff">Create Now</i></a>
+                  </span>
+                </li>
+                  {% endfor %}
+            </ul>
+            <p class="text-small text-muted mb-0 pt-3">
+                Create Staff, Create Course, then allocate course
+            </p>
+            <span class="badge badge-primary badge-pill pull-right">All course{{ form.courses|length|pluralize }}:{{ form.courses|length }}
+            </span>
+          </div>
+        </div>
+      </div>
+  
+      <div class="col-lg-3 col-md-3">
+      </div>
+  
+      </div>
+      <div class="text-center">
+        <button type="submit" class="btn btn-primary">Allocate Now</button>
+        <a href="{% url 'course_allocation_upload' %}"><button type="button" class="btn btn-primary">Upload Now</button></a>
+      </div>
+  </form>
+{% endblock content %}

@@ -1,0 +1,55 @@
+{% extends 'base.html' %}
+
+{% block title %}ACRRPS | Mastersheet{% endblock title %}
+
+{% block side_bar %}
+    {% include 'partial_active_element.html' with active='Mastersheet' %}
+{% endblock side_bar %}
+
+{% block content %}
+          {% if messages %}
+        {% for message in messages %}
+          <div class="alert alert-success alert-dismissable">
+            <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+            {{ message }}
+          </div>
+        {% endfor %}
+      {% endif %}
+<div class="row">
+  <div class="col-md-2"></div>
+  <div class="col-md-8">
+    <div class="card">
+      <div class="card-header card-header-icon card-header-rose">
+        <div class="card-icon">
+          <i class="material-icons">library_books</i>
+        </div>
+        <h4 class="card-title">Mastersheet -
+          <small class="category">Select department and level to get the result mastersheet</small>
+        </h4>
+      </div>
+      <div class="card-body">
+        <form method="post">{% csrf_token %}
+          <div class="row">
+            <div class="col-md-6">
+              <div class="form-group">
+              <label class="bmd-label-floating ">{{form.department.label}}</label>
+                {{form.department}}
+                {{form.department.errors}}
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="form-group">
+              <label class="bmd-label-floating ">{{form.level.label}}</label>
+                {{form.level}}
+                {{form.level.errors}}
+              </div>
+            </div>
+          </div>
+          <button type="submit" class="btn btn-rose">Download </button>
+          <div class="clearfix"></div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,70 @@
+{% extends 'base.html' %}
+{% load humanize %}
+{% block title %}ACRRPS | {{ request.user.first_name|capfirst }}'s Allocated Courses{% endblock %}
+
+{% block side_bar %}
+    {% include 'partial_active_element.html' with active='allocated_courses' %}
+{% endblock side_bar %}
+
+{% block content %}
+        {% if messages %}
+        {% for message in messages %}
+          <div class="alert alert-success alert-dismissable">
+            <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+            {{ message }}
+          </div>
+        {% endfor %}
+      {% endif %}
+
+<div class="row">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-header card-header-primary card-header-icon">
+                <div class="card-icon">
+                  <i class="material-icons">library_books</i>
+                </div>
+                <h4 class="card-title">Allocated Courses</h4>  
+            </div>
+            <div class="card-body">
+                <div class="toolbar">
+                    <!--        Here you can write extra buttons/actions for the toolbar              -->
+                </div>
+                <div class="material-datatables">
+                    <table id="datatables" class="display table table-striped table-no-bordered table-hover" cellspacing="0" width="100%" style="width:100%">
+                      <thead>
+                        <tr>
+                          <th scope="col">#</th>
+                          <th scope="col">Course Code</th>
+                          <th scope="col">Course Title</th>
+                          <th scope="col">Course Unit</th>
+                          <th scope="col">Scoresheet</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {% for course in courses %}
+                        <tr>
+                          <th scope="row">{{ forloop.counter }}</th>
+                          <td>{{ course.courseCode }}</td>
+                          <td>{{ course }}</td>
+                          <td>{{ course.courseUnit }}</td>
+                          <td>
+                                <span class="table-remove"><a href="{% url 'scoresheet_download' course.id %}" class="btn btn-info btn-rounded btn-sm my-0">Download</a></span>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                        <td>{{ course.courseCode }}</td>
+                          <td></td>
+                          <td>No course is assigned to you !</td>
+                          <td></td>
+                        </tr>
+                      {% endfor %}
+                      </tbody>
+                    </table>
+                  </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

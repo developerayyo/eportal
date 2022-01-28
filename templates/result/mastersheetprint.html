@@ -1,0 +1,108 @@
+{% load static %}
+<style type="text/css">
+
+
+</style>
+<html>
+<body>
+    <header style="text-align: center;">
+        <div id="contain"style="">
+            <div class="infos" id="" style="width: 49%; float: left; ">
+                <img id="img" src="{% static 'assets/img/au.png' %}" alt="school logo" style="height: 150px; margin-top: 20px;"><br><br>
+                <h3>NOTE: </h3>
+                <p class="details">Courses Status: C-Compulsory, R-Required, E-Elective</p>
+                <p class="details">TCU-Total Credit Point, GPA-Grade Point Average</p>
+                <p class="details">CGPA-Cumulative Grade Point Average, NR-Not Registered</p>
+            </div>
+            <div id="brand" style="width: 49%; float: right; margin-top: 20px;">
+                <h1>Adeleke University,</h1>
+                <h3 style="text-transform: capitalize;">{{ faculty }}</h3>
+                <h3 style="text-transform: capitalize;">Department Of {{ dept }}</h3>
+                <h3>{{ current_session }} Session</h3>
+                <h3>{{ cs }} Semester</h3>
+                <h3>{{ level }} Level</h3>
+                <h3><span style="border-bottom: 2px solid black">Result Mastersheet</span></h3>
+            </div>
+        </div>
+    </header>
+  <table style="margin-top: 20px; border: 1px solid red; padding: 1px 1px;">
+    <thead>
+      <tr>
+        <th scope="col" class="number">S/N</th>
+        <th scope="col" class="">Names  / Outstanding Course(s)</th>
+        <th scope="col">Matric No</th>
+        <th colspan="2">Current</th>
+        <th scope="col">Cumulative</th>
+        <th scope="col">Courses(status)</th>
+        {% for course in coursesObj %}
+            <th scope="col">{{course.courseCode}}</th>
+        {% endfor %}
+      </tr>
+      <tr>
+        <th scope="col" class="number"></th>
+        <th scope="col" class=""></th>
+        <th scope="col"></th>
+        <th>TCU</th>
+        <th>GPA</th>
+        <th>CGPA</th>
+        <th scope="col">Credit Unit</th>
+        {% for course in coursesObj %}
+            <th scope="col">{{course.courseUnit}}</th>
+        {% endfor %}
+      </tr>
+    </thead>
+    <tbody>
+    {% for student in studentsObj %}
+        <tr>
+        <th scope="row">{{ forloop.counter }}</th>
+        <th scope="col">{{ student.user.get_full_name }}</th>
+        <th scope="col">{{ student.id_number }}</th>
+        <th>{{ TCU }}</th>
+        {% for r in res %}
+          {% if r.student.id_number == student.id_number %}
+            <th>{{ r.gpa }}</th>
+            {% else %}
+          {% endif %}
+        {% endfor %}
+        {% for r in res %}
+          {% if r.student.id_number == student.id_number %}
+            <th>{{ r.cgpa }}</th>
+            {% else %}                                              
+          {% endif %}
+        {% endfor %}
+        {% for r in res %}
+          {% if r.student.id_number == student.id_number %}
+            {% if r.cgpa >= 4.5 %}
+            <th>First Class</th>
+            {% else %}
+              <th>No Class</th>
+            {% endif %}
+            {% else %}
+          {% endif %}
+        {% endfor %}
+            {% with student.id_number as matric %}
+              {% for key, total in scores.items %}
+                 {% if matric == key %}
+                    {% for i in total %}
+                      <td>{{ i }}</td>
+                    {% endfor %}
+                 {% endif %}
+              {% endfor %}
+            {% endwith %}
+      </tr>
+      <tr>
+      <th></th>
+      <td>Outstanding Courses</td>
+      {% for o in oc %}
+        {% if o.student.id_number == student.id_number %}
+          <td style="color: red;">{{ o.course.courseCode }}</td>
+        {% endif %}
+      {% endfor %}
+      </tr>
+    {% endfor %}
+    </tbody>
+    <br>
+  </table>
+<br>
+</body>
+</html>

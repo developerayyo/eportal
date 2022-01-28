@@ -1,0 +1,37 @@
+{% extends 'base.html' %}
+
+{% block title %}ACRRPS | Score Entry{% endblock title %}
+
+{% block side_bar %}
+    {% include 'partial_active_element.html' with active='Add_Score' %}
+{% endblock side_bar %}
+
+{% block content %}
+
+	<!-- Editable table -->
+	<div class="card">
+	<h6 class="card-header text-center font-weight-bold text-uppercase py-4">{{ current_semester }} Semester - {{ current_session }}</h6>
+		<div class="container">
+		  <div class="row">
+		    <div class="col-md-4">
+		    	<div class="dropdown">
+	    			<button class="btn btn-primary dropdown-toggle float-right" type="button" id="dropdownMenu3" 		data-toggle="dropdown"
+		    			aria-haspopup="true" aria-expanded="false">
+		    			Select Course
+		    		</button>
+
+					<div class="dropdown-menu" aria-labelledby="dropdownMenu3">
+	    				<h6 class="dropdown-header">Select Course</h6>
+	    				{% for course in courses %}
+	    				<a data-toggle="tooltip" title="{{ course.courseTitle }}" class="dropdown-item" href="{% url 'add_score_for' course.id %}">{{ course.courseCode }}</a>
+	    				{% empty %}
+		    				<h6 data-toggle="tooltip" class="text-center" title="maybe you have'nt been allocated any course yet">
+			    					No course
+		    				</h6>
+	    				{% endfor %}
+					</div>
+
+				</div>
+			</div>
+		  </div>
+{% endblock %}

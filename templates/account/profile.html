@@ -1,0 +1,84 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load humanize %}
+
+{% block title %}ACRRPS | {{ user.first_name|capfirst }}'s Profile{% endblock title %}
+
+{% block side_bar %}
+    {% include 'partial_active_element.html' with active='Profile' %}
+{% endblock side_bar %}
+
+{% block content %}
+  <div class="row">
+    <div class="col-md-8">
+      <div class="card">
+        <div class="card-header card-header-icon card-header-rose">
+          <div class="card-icon">
+            <i class="material-icons">perm_identity</i>
+          </div>
+          <h4 class="card-title">Profile -
+            <small class="category">{{ user.first_name|capfirst }}'s profile</small>
+          </h4>
+        </div>
+        <div class="card-body">
+            <div class="row">
+              <div class="col-md-4">
+                  <span type="text" class=""><b>Firstname:</b> {{ request.user.first_name|capfirst }}</span>
+              </div>
+              <div class="col-md-4">
+                <span type="text" class=""><b>Lastname:</b> {{ request.user.last_name|capfirst }}</span>
+              </div>
+              <div class="col-md-4">
+                <span type="text" class=""><b>Email:</b> {{ request.user.email|capfirst }}</span>
+              </div>
+              <br>
+              <br>
+              <div class="col-md-4">
+                <span type="text" class=""><b>Username:</b> {{ request.user.username }}</span>
+              </div>
+              <div class="col-md-4">
+                <span type="text" class=""><b>Phone:</b> {{ request.user.phone }}</span>
+              </div>
+              <div class="col-md-4">
+                <span type="text" class=""><b>Address :</b> {{ request.user.address }}</span>
+              </div>
+              <br>
+              <br>
+              {% if request.user.is_student %}
+              <div class="col-md-4">
+                <span type="text" class=""><b>Level :</b> {{ level.level }}</span>
+              </div>
+              <div class="col-md-4">
+                <span type="text" class=""><b>Matric No :</b> {{ level }}</span>
+              </div>
+              <div class="col-md-4">
+                <span type="text" class=""><b>Department:</b> {{ level.department }}</span>
+              </div>
+              <br>
+              <br>
+              <div class="col-md-4">
+                <span type="text" class=""><b>Faculty:</b> {{ level.faculty }}</span>
+              </div>
+              {% endif %}
+            </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="card card-profile">
+        <div class="card-avatar">
+          <a href="#pablo">
+            <img class="img" src="{{ request.user.get_picture }}" />
+          </a>
+        </div>
+        <div class="card-body">
+          <h6 class="card-category text-gray"><b>ROLE:</b> {{type}}</h6>
+          <h4 class="card-title"><b>Fullname:</b> {{ request.user.get_full_name }}</h4>
+          <h4 class="card-title"><b>Status:</b> {% if request.user.is_active == True %}Active{% else %} Inactive {% endif %}</h4>
+          <h4 class="card-title"><b>Registered:</b> {{ request.user.date_joined|naturaltime }}</h4>
+          <a href="#pablo" class="btn btn-rose btn-round">Follow</a>
+        </div>
+      </div>
+    </div>
+  </div>
+{% endblock %}

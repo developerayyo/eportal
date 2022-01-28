@@ -1,0 +1,118 @@
+<ul class="nav">
+    <li class="nav-item {% if active == 'Dashboard' %} active {% endif %}">
+        <a class="nav-link" href="/">
+          <i class="material-icons">dashboard</i>
+          <p> Dashboard </p>
+        </a>
+    </li>
+    {% if request.user.is_superuser %}
+        <li class="nav-item {% if active == 'students' %} active {% endif %}">
+            <a class="nav-link" href="{% url 'student_list' %}">
+            <i class="material-icons">groups</i>
+            <p> Students </p>
+            </a>
+        </li>
+    {% endif %}
+    {% if request.user.is_superuser %}
+        <li class="nav-item {% if active == 'staff' %} active {% endif %}">
+            <a class="nav-link" href="{% url 'staff_list' %}">
+            <i class="material-icons">supervisor_account</i>
+            <p> Staff </p>
+            </a>
+        </li>
+    {% endif %}
+    {% if request.user.is_superuser %}
+        <li class="nav-item {% if active == 'course_list' %} active {% endif %}">
+            <a class="nav-link" href="{% url 'course_list' %}">
+            <i class="material-icons">library_books</i>
+            <p> Courses </p>
+            </a>
+        </li>
+    {% endif %}
+    {% if request.user.is_superuser %}
+        <li class="nav-item {% if active == 'course_allocation' %} active {% endif %}">
+            <a class="nav-link" href="{% url 'course_allocation' %}">
+            <i class="material-icons">assignment_ind</i>
+            <p> Course Allocation </p>
+            </a>
+        </li>
+    {% endif %}
+    {% if request.user.is_superuser %}
+        <li class="nav-item {% if active == 'course_allocation_view' %} active {% endif %}">
+            <a class="nav-link" href="{% url 'course_allocation_view' %}">
+            <i class="material-icons">assignment_ind</i>
+            <p> Allocation List </p>
+            </a>
+        </li>
+    {% endif %}
+    {% if request.user.is_superuser %}
+        <li class="nav-item {% if active == 'Mastersheet' %} active {% endif %}">
+            <a class="nav-link" href="{% url 'mastersheet' %}">
+            <i class="material-icons">assignment_ind</i>
+            <p>Result Mastersheet </p>
+            </a>
+        </li>
+    {% endif %}
+    {% if request.user.is_student %}
+        <li class="nav-item {% if active == 'course_registration' %} active {% endif %}">
+            <a class="nav-link" href="{% url 'course_registration' %}">
+            <i class="material-icons">assignment_ind</i>
+            <p> Course Registration </p>
+            </a>
+        </li>
+    {% endif %}
+    {% if request.user.is_student %}
+        <li class="nav-item {% if active == 'registered_courses' %} active {% endif %}">
+            <a class="nav-link" href="{% url 'registered_courses' %}">
+            <i class="material-icons">library_books</i>
+            <p> Registered Courses </p>
+            </a>
+        </li>
+    {% endif %}
+    {% if request.user.is_student %}
+        <li class="nav-item {% if active == 'view_results' %} active {% endif %}">
+            <a class="nav-link" href="{% url 'view_results' %}">
+            <i class="material-icons">note</i>
+            <p> View Result </p>
+            </a>
+        </li>
+    {% endif %}
+    {% if request.user.is_lecturer %}
+        <li class="nav-item {% if active == 'allocated_courses' %} active {% endif %}">
+            <a class="nav-link" href="{% url 'allocated_courses' %}">
+            <i class="material-icons">library_books</i>
+            <p>Allocated Courses </p>
+            </a>
+        </li>
+    {% endif %}
+    {% if request.user.is_lecturer %}
+        <li class="nav-item {% if active == 'Add_Score' %} active {% endif %}">
+            <a class="nav-link" href="{% url 'add_score' %}">
+            <i class="material-icons">publish</i>
+            <p> Upload Scoresheet </p>
+            </a>
+        </li>
+    {% endif %}
+    <li class="nav-item {% if active == 'change_password' %} active {% endif %}">
+        <a class="nav-link" href="{% url 'change_password' %}">
+        <i class="material-icons">fingerprint</i>
+        <p> Change Password </p>
+        </a>
+    </li>
+    {% if request.user.is_superuser %}
+        <li class="nav-item {% if active == 'manage_session' %} active {% endif %}">
+            <a class="nav-link" href="{% url 'manage_session' %}">
+            <i class="material-icons">miscellaneous_services</i>
+            <p> Session Settings </p>
+            </a>
+        </li>
+    {% endif %}
+    {% if request.user.is_superuser %}
+        <li class="nav-item {% if active == 'manage_semester' %} active {% endif %}">
+            <a class="nav-link" href="{% url 'manage_semester' %}">
+            <i class="material-icons">miscellaneous_services</i>
+            <p> Semester Settings </p>
+            </a>
+        </li>
+    {% endif %}
+</ul>
