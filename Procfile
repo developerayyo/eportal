@@ -1,3 +1,1 @@
-release: python manage.py migrate
-web: gunicorn eportal.wsgi --log-file -
-worker: celery worker -A eportal -l info
+web: python manage.py runserver 0.0.0.0:$PORT
