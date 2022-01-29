@@ -3,7 +3,7 @@ from django.urls import path, include
 from django.contrib.auth import views
 from django.contrib.staticfiles.urls import static
 from django.contrib.staticfiles.urls import staticfiles_urlpatterns
-from .settings import base
+from . import settings
 from django.conf import settings
 
 urlpatterns = [

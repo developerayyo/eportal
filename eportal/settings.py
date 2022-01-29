@@ -16,9 +16,11 @@ import django_heroku
 import dj_database_url
 from decouple import config, Csv
 
+#use this for django 3 if u put settings in a folder
+# BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(
+#     os.path.join(__file__, os.pardir))))
 
-BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(
-    os.path.join(__file__, os.pardir))))
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 SECRET_KEY = config('SECRET_KEY')
 
@@ -74,6 +76,15 @@ TEMPLATES = [
     },
 ]
 
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+    }
+}
+
+SERVER_EMAIL = "server@eportalproject"
+
 WSGI_APPLICATION = 'eportal.wsgi.application'
 
 AUTH_PASSWORD_VALIDATORS = [
@@ -107,6 +118,13 @@ USE_TZ = True
 AUTH_USER_MODEL = 'portal.User'
 LOGIN_REDIRECT_URL = '/'
 LOGOUT_REDIRECT_URL = '/'
+
+# local static settings 
+STATIC_URL = '/static/'
+STATIC_ROOT = os.path.join(BASE_DIR, 'static')
+# local media settings
+MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 STATICFILES_DIRS = [
     os.path.join(BASE_DIR, 'portal/static'),
@@ -156,3 +174,6 @@ REST_FRAMEWORK = {
 IMPORT_EXPORT_USE_TRANSACTIONS = True
 
 CORS_ORIGIN_ALLOW_ALL = True
+
+import django_heroku
+django_heroku.settings(locals())
