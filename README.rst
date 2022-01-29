@@ -22,9 +22,9 @@ section. I make use of Readthedocs.io to manage the documentation and you can cl
     :alt: licence
     :target: https://eportalproject.readthedocs.io/en/latest/getting%20started.html#licences
 
-.. |website| image:: https://img.shields.io/website?up_message=eportalproject.ml&url=https%3A%2F%2Feportalproject.ml
+.. |website| image:: https://img.shields.io/website?up_message=eportalproject.ml&url=https%3A%2F%2Feportalproject.herokuapp.com
     :alt: Website
-    :target: https://eportalproject.ml
+    :target: https://eportalproject.herokuapp.com/
 
 .. |docs| image:: https://img.shields.io/readthedocs/eportalproject
     :alt: Read the Docs
